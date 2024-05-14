@@ -1,4 +1,6 @@
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import NextAuth from "next-auth";
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 import { type JWT } from "next-auth/jwt";
 
 declare module "next-auth" {
@@ -8,6 +10,8 @@ declare module "next-auth" {
   export interface User {
     id: number;
     email: string;
+    firstName: string;
+    lastName: string;
   }
 
   interface Session {
@@ -20,12 +24,7 @@ declare module "next-auth/jwt" {
   interface JWT {
     id: number;
     email: string;
-  }
-}
-
-declare module "@auth/core/adapter" {
-  interface AdapterUser {
-    id: number;
-    email: string;
+    firstName: string;
+    lastName: string;
   }
 }

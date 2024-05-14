@@ -1,23 +1,22 @@
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
-import { z } from "zod";
 import { hash } from "bcrypt";
+import { registerSchema } from "~/types/schema/register";
 
 export const authRouter = createTRPCRouter({
   register: publicProcedure
-    .input(
-      z.object({
-        email: z.string().email(),
-        password: z.string(),
-      }),
-    )
-    .mutation(async ({ input: { email, password }, ctx }) => {
-      const hashedPassword = await hash(password, 10);
+    .input(registerSchema)
+    .mutation(
+      async ({ input: { email, password, lastName, firstName }, ctx }) => {
+        const hashedPassword = await hash(password, 10);
 
-      await ctx.db.user.create({
-        data: {
-          email,
-          password: hashedPassword,
-        },
-      });
-    }),
+        await ctx.db.user.create({
+          data: {
+            email,
+            password: hashedPassword,
+            firstName,
+            lastName,
+          },
+        });
+      },
+    ),
 });

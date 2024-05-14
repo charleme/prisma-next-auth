@@ -3,6 +3,7 @@ import "~/styles/globals.css";
 import { Inter as FontSans } from "next/font/google";
 import { TRPCReactProvider } from "~/trpc/react";
 import { cn } from "~/lib/utils";
+import { Toaster } from "~/components/ui/toaster";
 
 export const metadata = {
   title: "Create T3 App",
@@ -15,7 +16,7 @@ const fontSans = FontSans({
   variable: "--font-sans",
 });
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -30,6 +31,7 @@ export default function RootLayout({
     >
       <body>
         <TRPCReactProvider>{children}</TRPCReactProvider>
+        <Toaster />
       </body>
     </html>
   );

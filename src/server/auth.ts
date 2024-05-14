@@ -47,12 +47,12 @@ export const authOptions: NextAuthOptions = {
       if (user?.id && user.email) {
         token.id = jwtUser.id;
         token.email = jwtUser.email;
+        token.firstName = jwtUser.firstName;
+        token.lastName = jwtUser.lastName;
       }
-      console.log({ token });
       return token;
     },
     session({ session, token }) {
-      console.log({ session, token });
       session.user = token;
       return session;
     },

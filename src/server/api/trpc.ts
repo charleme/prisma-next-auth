@@ -6,11 +6,13 @@
  * TL;DR - This is where all the tRPC server stuff is created and plugged in. The pieces you will
  * need to use are documented accordingly near the end.
  */
-import { initTRPC } from "@trpc/server";
+import { initTRPC, type TRPCError } from "@trpc/server";
 import superjson from "superjson";
-import { ZodError } from "zod";
 
 import { db } from "~/server/db";
+import { getServerAuthSession } from "~/server/auth";
+import { handleErrors } from "~/server/api/handlers/error";
+import { type DefaultErrorShape } from "@trpc/server/unstable-core-do-not-import";
 
 /**
  * 1. CONTEXT
@@ -25,8 +27,10 @@ import { db } from "~/server/db";
  * @see https://trpc.io/docs/server/context
  */
 export const createTRPCContext = async (opts: { headers: Headers }) => {
+  const session = await getServerAuthSession();
   return {
     db,
+    session,
     ...opts,
   };
 };
@@ -38,19 +42,31 @@ export const createTRPCContext = async (opts: { headers: Headers }) => {
  * ZodErrors so that you get typesafety on the frontend if your procedure fails due to validation
  * errors on the backend.
  */
+const errorFormatter = ({
+  shape,
+  error,
+}: {
+  shape: DefaultErrorShape;
+  error: TRPCError;
+}) => {
+  const errorData = handleErrors(error.cause);
+
+  return {
+    ...shape,
+    data: {
+      ...shape.data,
+      code: errorData ? "UNPROCESSABLE_CONTENT" : shape.data.code,
+      errors: errorData,
+    },
+  };
+};
+
 const t = initTRPC.context<typeof createTRPCContext>().create({
   transformer: superjson,
-  errorFormatter({ shape, error }) {
-    return {
-      ...shape,
-      data: {
-        ...shape.data,
-        zodError:
-          error.cause instanceof ZodError ? error.cause.flatten() : null,
-      },
-    };
-  },
+  errorFormatter,
 });
+
+export type TrpcFormatedError = ReturnType<typeof errorFormatter>;
 
 /**
  * Create a server-side caller.

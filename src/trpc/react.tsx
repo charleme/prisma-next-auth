@@ -1,24 +1,41 @@
 "use client";
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { loggerLink, unstable_httpBatchStreamLink } from "@trpc/client";
+import {
+  MutationCache,
+  QueryCache,
+  QueryClient,
+  QueryClientProvider,
+} from "@tanstack/react-query";
+import {
+  loggerLink,
+  TRPCClientError,
+  unstable_httpBatchStreamLink,
+} from "@trpc/client";
 import { createTRPCReact } from "@trpc/react-query";
 import { type inferRouterInputs, type inferRouterOutputs } from "@trpc/server";
 import { useState } from "react";
 import SuperJSON from "superjson";
 
 import { type AppRouter } from "~/server/api/root";
+import { useToast } from "~/components/ui/use-toast";
+import { type TrpcFormatedError } from "~/server/api/trpc";
 
-const createQueryClient = () => new QueryClient();
+const createQueryClient = (conf?: {
+  queryCache?: QueryCache;
+  mutationCache?: MutationCache;
+}) => new QueryClient(conf);
 
 let clientQueryClientSingleton: QueryClient | undefined = undefined;
-const getQueryClient = () => {
+const getQueryClient = (conf?: {
+  queryCache?: QueryCache;
+  mutationCache?: MutationCache;
+}) => {
   if (typeof window === "undefined") {
     // Server: always make a new query client
-    return createQueryClient();
+    return createQueryClient(conf);
   }
   // Browser: use singleton pattern to keep the same query client
-  return (clientQueryClientSingleton ??= createQueryClient());
+  return (clientQueryClientSingleton ??= createQueryClient(conf));
 };
 
 export const api = createTRPCReact<AppRouter>();
@@ -38,7 +55,40 @@ export type RouterInputs = inferRouterInputs<AppRouter>;
 export type RouterOutputs = inferRouterOutputs<AppRouter>;
 
 export function TRPCReactProvider(props: { children: React.ReactNode }) {
-  const queryClient = getQueryClient();
+  const { toast } = useToast();
+  const queryClient = getQueryClient({
+    queryCache: new QueryCache({
+      onError: (_) =>
+        toast({
+          title: "Uh! Something went wrong",
+          description: "Please try again later",
+          variant: "destructive",
+        }),
+    }),
+    mutationCache: new MutationCache({
+      onError: (error) => {
+        if (error instanceof TRPCClientError) {
+          const trpcError = error as unknown as TrpcFormatedError;
+          switch (trpcError.data.code) {
+            case "UNPROCESSABLE_CONTENT":
+              return toast({
+                title: "Validation error",
+                description: "Please check your input",
+                variant: "destructive",
+              });
+            default:
+              break;
+          }
+        }
+
+        return toast({
+          title: "Uh! Something went wrong",
+          description: "Please try again later",
+          variant: "destructive",
+        });
+      },
+    }),
+  });
 
   const [trpcClient] = useState(() =>
     api.createClient({
@@ -58,7 +108,7 @@ export function TRPCReactProvider(props: { children: React.ReactNode }) {
           },
         }),
       ],
-    })
+    }),
   );
 
   return (

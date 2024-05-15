@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
-import { Button } from "~/components/ui/button";
 import { Form } from "~/components/ui/form";
 import { api } from "~/trpc/react";
 import {
@@ -17,9 +16,10 @@ import Link from "next/link";
 import { InputField } from "~/components/form/input-field";
 import { type RegisterFormData, registerSchema } from "~/types/schema/register";
 import { useRouter } from "next/navigation";
+import { SubmitButton } from "~/components/form/submit-button";
 
 export function RegisterForm() {
-  const { mutate: register } = api.auth.register.useMutation({});
+  const { mutate: register, isPending } = api.auth.register.useMutation();
   const router = useRouter();
 
   const form = useForm({
@@ -33,7 +33,21 @@ export function RegisterForm() {
   });
 
   const onSubmit = (data: RegisterFormData) => {
-    register(data, { onSuccess: () => router.push("/login") });
+    register(data, {
+      onSuccess: () => router.push("/login"),
+      onError: (error) => {
+        const fieldErrors: Record<string, string> =
+          error?.data?.errors?.fieldErrors ?? {};
+        const emailError = "email" in fieldErrors ? fieldErrors.email : null;
+
+        if (emailError) {
+          form.control.setError("email", {
+            type: "manual",
+            message: emailError,
+          });
+        }
+      },
+    });
   };
 
   return (
@@ -82,9 +96,9 @@ export function RegisterForm() {
                   inputProps={{ type: "password" }}
                 />
               </div>
-              <Button type="submit" className="w-full">
+              <SubmitButton isSubmitting={isPending} className="w-full">
                 Create an account
-              </Button>
+              </SubmitButton>
             </div>
           </form>
         </Form>

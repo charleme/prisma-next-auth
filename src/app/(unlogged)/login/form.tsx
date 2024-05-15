@@ -4,7 +4,6 @@ import { signIn } from "next-auth/react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 
-import { Button } from "~/components/ui/button";
 import { Form } from "~/components/ui/form";
 import Link from "next/link";
 import {
@@ -18,10 +17,13 @@ import { InputField } from "~/components/form/input-field";
 import { useToast } from "~/components/ui/use-toast";
 import { type LoginFormData, loginSchema } from "~/types/schema/login";
 import { useRouter } from "next/navigation";
+import { SubmitButton } from "~/components/form/submit-button";
+import { useState } from "react";
 
 export function LoginForm() {
   const { toast } = useToast();
   const router = useRouter();
+  const [isPending, setIsPending] = useState(false);
 
   const form = useForm({
     resolver: zodResolver(loginSchema),
@@ -30,15 +32,18 @@ export function LoginForm() {
       password: "",
     },
   });
-
   const onSubmit = async (data: LoginFormData) => {
     const { email, password } = data;
+
+    setIsPending(true);
 
     const response = await signIn("credentials", {
       email,
       password,
       redirect: false,
     });
+
+    setIsPending(false);
 
     if (!response?.ok) {
       toast({
@@ -81,13 +86,13 @@ export function LoginForm() {
                   inputProps={{ type: "password" }}
                 />
               </div>
-              <Button
-                type="submit"
+              <SubmitButton
+                isSubmitting={isPending}
                 className="w-full"
                 disabled={form.formState.isSubmitting}
               >
                 Login
-              </Button>
+              </SubmitButton>
             </div>
           </form>
         </Form>

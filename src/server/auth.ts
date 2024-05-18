@@ -20,8 +20,27 @@ export const authOptions: NextAuthOptions = {
         password: {},
       },
       async authorize(credentials, _) {
-        const user = await db.user.findFirst({
+        const user = await db.user.findUnique({
           where: { email: credentials?.email },
+          select: {
+            id: true,
+            email: true,
+            firstName: true,
+            lastName: true,
+            password: true,
+            roles: {
+              select: {
+                id: true,
+                name: true,
+                rights: {
+                  select: {
+                    id: true,
+                    name: true,
+                  },
+                },
+              },
+            },
+          },
         });
 
         const password = credentials?.password ?? "";
@@ -45,10 +64,7 @@ export const authOptions: NextAuthOptions = {
       const jwtUser = user as User;
 
       if (user?.id && user.email) {
-        token.id = jwtUser.id;
-        token.email = jwtUser.email;
-        token.firstName = jwtUser.firstName;
-        token.lastName = jwtUser.lastName;
+        token = { ...token, ...jwtUser };
       }
       return token;
     },

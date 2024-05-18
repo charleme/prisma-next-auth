@@ -27,6 +27,10 @@ export default async function Layout({
       link: "/user",
       label: "Users",
     },
+    {
+      link: "/role",
+      label: "Roles",
+    },
   ];
 
   return (
@@ -115,7 +119,7 @@ export default async function Layout({
           </DropdownMenu>
         </div>
       </header>
-      {children}
+      <div className="container mx-auto bg-muted/40 px-4 pt-4">{children}</div>
     </div>
   );
 }

@@ -10,19 +10,28 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model Post {
-  id        Int      @id @default(autoincrement())
-  name      String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@index([name])
-}
-
 model User {
-  id        Int    @id @default(autoincrement())
+  id        String @id @default(cuid())
   email     String @unique
   password  String
   firstName String
   lastName  String
+
+  roles Role[]
+}
+
+model Right {
+  id   Int    @id @default(autoincrement())
+  name String @unique
+
+  roles Role[]
+}
+
+model Role {
+  id          Int    @id @default(autoincrement())
+  name        String @unique
+  description String @default("")
+
+  rights Right[]
+  users  User[]
 }

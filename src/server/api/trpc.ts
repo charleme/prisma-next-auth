@@ -6,13 +6,14 @@
  * TL;DR - This is where all the tRPC server stuff is created and plugged in. The pieces you will
  * need to use are documented accordingly near the end.
  */
-import { initTRPC, type TRPCError } from "@trpc/server";
+import { TRPCError, initTRPC } from "@trpc/server";
 import superjson from "superjson";
 
 import { db } from "~/server/db";
 import { getServerAuthSession } from "~/server/auth";
 import { handleErrors } from "~/server/api/handlers/error";
 import { type DefaultErrorShape } from "@trpc/server/unstable-core-do-not-import";
+import { type Role } from "~/types/enum/Role";
 
 /**
  * 1. CONTEXT
@@ -97,3 +98,36 @@ export const createTRPCRouter = t.router;
  * are logged in.
  */
 export const publicProcedure = t.procedure;
+
+export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
+  if (!ctx.session?.user) {
+    throw new TRPCError({
+      code: "UNAUTHORIZED",
+    });
+  }
+
+  return next({
+    ctx: {
+      // infers the `session` as non-nullable
+      session: { ...ctx.session, user: ctx.session.user },
+    },
+  });
+});
+
+export const protectedProcedureByRoles = (rightIds: Role[]) => {
+  return protectedProcedure.use(async ({ ctx, next }) => {
+    const userRightIds = ctx.session.user.roles.flatMap((role) =>
+      role.rights.map((right) => right.id),
+    );
+
+    const hasRight = rightIds.some((rightId) => userRightIds.includes(rightId));
+
+    if (!hasRight) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+      });
+    }
+
+    return next();
+  });
+};

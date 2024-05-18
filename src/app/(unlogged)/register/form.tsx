@@ -17,6 +17,7 @@ import { InputField } from "~/components/form/input-field";
 import { type RegisterFormData, registerSchema } from "~/types/schema/register";
 import { useRouter } from "next/navigation";
 import { SubmitButton } from "~/components/form/submit-button";
+import { handleFieldErrors } from "~/lib/handleFieldErrors";
 
 export function RegisterForm() {
   const { mutate: register, isPending } = api.auth.register.useMutation();
@@ -36,16 +37,7 @@ export function RegisterForm() {
     register(data, {
       onSuccess: () => router.push("/login"),
       onError: (error) => {
-        const fieldErrors: Record<string, string> =
-          error?.data?.errors?.fieldErrors ?? {};
-        const emailError = "email" in fieldErrors ? fieldErrors.email : null;
-
-        if (emailError) {
-          form.control.setError("email", {
-            type: "manual",
-            message: emailError,
-          });
-        }
+        handleFieldErrors(form, error);
       },
     });
   };

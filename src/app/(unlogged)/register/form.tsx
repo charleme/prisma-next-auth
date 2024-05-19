@@ -14,7 +14,10 @@ import {
 } from "~/components/ui/card";
 import Link from "next/link";
 import { InputField } from "~/components/form/input-field";
-import { type RegisterFormData, registerSchema } from "~/types/schema/register";
+import {
+  type RegisterFormData,
+  registerSchema,
+} from "~/types/schema/auth/register";
 import { useRouter } from "next/navigation";
 import { SubmitButton } from "~/components/form/submit-button";
 import { handleFieldErrors } from "~/lib/handleFieldErrors";

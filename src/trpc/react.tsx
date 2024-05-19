@@ -19,6 +19,7 @@ import SuperJSON from "superjson";
 import { type AppRouter } from "~/server/api/root";
 import { useToast } from "~/components/ui/use-toast";
 import { type TrpcFormatedError } from "~/server/api/trpc";
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 
 const createQueryClient = (conf?: {
   queryCache?: QueryCache;
@@ -56,14 +57,44 @@ export type RouterOutputs = inferRouterOutputs<AppRouter>;
 
 export function TRPCReactProvider(props: { children: React.ReactNode }) {
   const { toast } = useToast();
+
+  const toastUnkwownError = () =>
+    toast({
+      title: "Uh! Something went wrong",
+      description: "Please try again later",
+      variant: "destructive",
+    });
+
+  const unauthorizedError = () =>
+    toast({
+      title: "Unauthorized",
+      description: "You need to be logged in to perform this action",
+      variant: "destructive",
+    });
+
+  const forbiddenError = () =>
+    toast({
+      title: "Forbidden",
+      description: "You don't have permission to perform this action",
+      variant: "destructive",
+    });
+
   const queryClient = getQueryClient({
     queryCache: new QueryCache({
-      onError: (_) =>
-        toast({
-          title: "Uh! Something went wrong",
-          description: "Please try again later",
-          variant: "destructive",
-        }),
+      onError: (error) => {
+        if (error instanceof TRPCClientError) {
+          const trpcError = error as unknown as TrpcFormatedError;
+          switch (trpcError.data.code) {
+            case "UNAUTHORIZED":
+              return unauthorizedError();
+            case "FORBIDDEN":
+              return forbiddenError();
+            default:
+              break;
+          }
+        }
+        toastUnkwownError();
+      },
     }),
     mutationCache: new MutationCache({
       onError: (error) => {
@@ -76,16 +107,16 @@ export function TRPCReactProvider(props: { children: React.ReactNode }) {
                 description: "Please check your input",
                 variant: "destructive",
               });
+            case "UNAUTHORIZED":
+              return unauthorizedError();
+            case "FORBIDDEN":
+              return forbiddenError();
             default:
               break;
           }
         }
 
-        return toast({
-          title: "Uh! Something went wrong",
-          description: "Please try again later",
-          variant: "destructive",
-        });
+        return toastUnkwownError();
       },
     }),
   });
@@ -115,6 +146,7 @@ export function TRPCReactProvider(props: { children: React.ReactNode }) {
     <QueryClientProvider client={queryClient}>
       <api.Provider client={trpcClient} queryClient={queryClient}>
         {props.children}
+        <ReactQueryDevtools />
       </api.Provider>
     </QueryClientProvider>
   );

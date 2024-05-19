@@ -10,14 +10,15 @@ CREATE TABLE "User" (
 -- CreateTable
 CREATE TABLE "Right" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-    "name" TEXT NOT NULL
+    "name" TEXT NOT NULL,
+    "description" TEXT NOT NULL
 );
 
 -- CreateTable
 CREATE TABLE "Role" (
     "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
     "name" TEXT NOT NULL,
-    "description" TEXT NOT NULL DEFAULT ''
+    "description" TEXT NOT NULL
 );
 
 -- CreateTable
@@ -57,17 +58,17 @@ CREATE UNIQUE INDEX "_RoleToUser_AB_unique" ON "_RoleToUser"("A", "B");
 -- CreateIndex
 CREATE INDEX "_RoleToUser_B_index" ON "_RoleToUser"("B");
 
-INSERT INTO 'RIGHT' ('id', 'name')
+INSERT INTO Right (id, name, description)
 VALUES
-    (1, 'VIEW_RIGHT_LIST'),
-    (2, 'VIEW_RIGHT'),
-    (3, 'UPDATE_RIGHT'),
-    (4, 'DELETE_RIGHT');
+    (1, 'VIEW_ROLE_LIST', 'Allows to view the list of roles'),
+    (2, 'VIEW_ROLE', 'Allows to view the details of a role'),
+    (3, 'UPDATE_ROLE', 'Allows to create and update an existing role'),
+    (4, 'DELETE_ROLE', 'Allows to delete an existing role');
 
-INSERT INTO "Role" ("id", "name", "description")
+INSERT INTO Role (id, name, description)
 VALUES
-    (1, 'Admin', 'Admin role'),
-    (2, 'User', 'Basic role with only view rights');
+    (1, 'ADMIN', 'Administrator role'),
+    (2, 'USER', 'User role');
 
 INSERT INTO "_RightToRole" ("A", "B")
 VALUES

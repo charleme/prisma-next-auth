@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { SignOutMenuItem } from "~/app/(logged)/sign-out-menu-item";
+import { AppMenu } from "~/app/(logged)/app-menu";
 
 export default async function Layout({
   children,
@@ -22,20 +23,9 @@ export default async function Layout({
     redirect("/login");
   }
 
-  const menuItems = [
-    {
-      link: "/user",
-      label: "Users",
-    },
-    {
-      link: "/role",
-      label: "Roles",
-    },
-  ];
-
   return (
     <div className="flex min-h-screen w-full flex-col">
-      <header className="sticky top-0 flex h-16 items-center gap-4 border-b bg-background px-4 md:px-6">
+      <header className="sticky top-0 flex h-16 items-center gap-4 border-b px-4 md:px-6">
         <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
           <Link
             href="/"
@@ -44,15 +34,7 @@ export default async function Layout({
             <Package2 className="h-6 w-6" />
             <span className="sr-only">Acme Inc</span>
           </Link>
-          {menuItems.map((item) => (
-            <Link
-              key={item.link}
-              href={item.link}
-              className="text-muted-foreground transition-colors hover:text-foreground"
-            >
-              {item.label}
-            </Link>
-          ))}
+          <AppMenu />
         </nav>
         <Sheet>
           <SheetTrigger asChild>
@@ -119,7 +101,9 @@ export default async function Layout({
           </DropdownMenu>
         </div>
       </header>
-      <div className="container mx-auto bg-muted/40 px-4 pt-4">{children}</div>
+      <div className="bg-muted/40">
+        <div className="container mx-auto px-4 pt-4">{children}</div>
+      </div>
     </div>
   );
 }

@@ -12,8 +12,16 @@ import {
 } from "~/components/ui/card";
 import LoadingRoleList from "~/app/(logged)/role/loading-role-list";
 import { RequestSuspense } from "~/components/suspense/request-suspense";
+import { getAuthUser } from "~/server/auth";
+import { Right } from "~/types/enum/Right";
+import { redirect } from "next/navigation";
 
 export default async function UserListPage() {
+  const authUser = await getAuthUser();
+  if (authUser === null || !authUser?.rights.includes(Right.VIEW_ROLE_LIST)) {
+    redirect("/");
+  }
+
   return (
     <div>
       <div className="mb-4 flex justify-end">

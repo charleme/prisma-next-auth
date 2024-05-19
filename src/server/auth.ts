@@ -1,7 +1,7 @@
 import CredentialsProvider from "next-auth/providers/credentials";
 import { compare } from "bcrypt";
 import { db } from "~/server/db";
-import { getServerSession, type NextAuthOptions, type User } from "next-auth";
+import { getServerSession, type NextAuthOptions } from "next-auth";
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -51,8 +51,13 @@ export const authOptions: NextAuthOptions = {
         }
 
         if (await compare(password, user.password)) {
-          const { password: _, ...userWithoutPassword } = user;
-          return userWithoutPassword;
+          const { password: _, roles, ...userWithoutPassword } = user;
+          return {
+            ...userWithoutPassword,
+            rights: roles.flatMap((role) =>
+              role.rights.map((right) => right.id),
+            ),
+          };
         }
 
         return null;
@@ -61,10 +66,8 @@ export const authOptions: NextAuthOptions = {
   ],
   callbacks: {
     jwt({ token, user }) {
-      const jwtUser = user as User;
-
       if (user?.id && user.email) {
-        token = { ...token, ...jwtUser };
+        token = { ...token, ...user };
       }
       return token;
     },

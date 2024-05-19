@@ -1,6 +1,6 @@
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
 import { hash } from "bcrypt";
-import { registerSchema } from "~/types/schema/register";
+import { registerSchema } from "~/types/schema/auth/register";
 
 export const authRouter = createTRPCRouter({
   register: publicProcedure

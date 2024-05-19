@@ -13,7 +13,7 @@ import { db } from "~/server/db";
 import { getServerAuthSession } from "~/server/auth";
 import { handleErrors } from "~/server/api/handlers/error";
 import { type DefaultErrorShape } from "@trpc/server/unstable-core-do-not-import";
-import { type Role } from "~/types/enum/Role";
+import { type Right } from "~/types/enum/Right";
 
 /**
  * 1. CONTEXT
@@ -114,13 +114,11 @@ export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
   });
 });
 
-export const protectedProcedureByRoles = (rightIds: Role[]) => {
+export const protectedProcedureByRights = (rightIds: Right[]) => {
   return protectedProcedure.use(async ({ ctx, next }) => {
-    const userRightIds = ctx.session.user.roles.flatMap((role) =>
-      role.rights.map((right) => right.id),
+    const hasRight = rightIds.some((rightId) =>
+      ctx.session.user.rights.includes(rightId),
     );
-
-    const hasRight = rightIds.some((rightId) => userRightIds.includes(rightId));
 
     if (!hasRight) {
       throw new TRPCError({

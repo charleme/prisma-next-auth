@@ -16,7 +16,7 @@ export function InputField<
   inputProps,
   ...props
 }: Omit<ControllerProps<TFieldValues, TName>, "render"> & {
-  label: string;
+  label?: string;
   inputProps?: InputProps;
 }) {
   return (

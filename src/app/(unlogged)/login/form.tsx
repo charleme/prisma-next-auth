@@ -15,7 +15,7 @@ import {
 } from "~/components/ui/card";
 import { InputField } from "~/components/form/input-field";
 import { useToast } from "~/components/ui/use-toast";
-import { type LoginFormData, loginSchema } from "~/types/schema/login";
+import { type LoginFormData, loginSchema } from "~/types/schema/auth/login";
 import { useRouter } from "next/navigation";
 import { SubmitButton } from "~/components/form/submit-button";
 import { useState } from "react";

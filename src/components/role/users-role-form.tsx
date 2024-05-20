@@ -15,14 +15,14 @@ import { SubmitButton } from "~/components/form/submit-button";
 import {
   type RoleGeneralFormData,
   roleGeneralFormSchema,
-} from "~/types/schema/role/roleGeneralForm";
+} from "~/types/schema/role/role-general-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { api } from "~/trpc/react";
 import { useToast } from "~/components/ui/use-toast";
 import { useRouter } from "next/navigation";
-import { handleFieldErrors } from "~/lib/handleFieldErrors";
+import { handleFieldErrors } from "~/lib/handle-field-errors";
 
-export const GeneralForm = ({
+export const UsersRoleForm = ({
   defaultValue,
   readOnly,
 }: {
@@ -100,7 +100,7 @@ export const GeneralForm = ({
               <SubmitButton
                 onClick={form.handleSubmit(onSubmit)}
                 isSubmitting={isCreatePending || isUpdatePending}
-                disabled={readOnly}
+                blocked={readOnly}
               >
                 Save
               </SubmitButton>

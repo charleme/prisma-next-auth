@@ -4,7 +4,9 @@ import {
 } from "~/server/api/trpc";
 import { Right } from "~/types/enum/Right";
 import { z } from "zod";
-import { roleGeneralFormSchema } from "~/types/schema/role/roleGeneralForm";
+import { roleGeneralFormSchema } from "~/types/schema/role/role-general-form";
+import { roleRightFormSchema } from "~/types/schema/role/role-right-form";
+import { TRPCError } from "@trpc/server";
 
 export const roleRouter = createTRPCRouter({
   list: protectedProcedureByRights([Right.VIEW_ROLE])
@@ -27,7 +29,7 @@ export const roleRouter = createTRPCRouter({
   get: protectedProcedureByRights([Right.VIEW_ROLE])
     .input(z.object({ id: z.number() }))
     .query(async ({ ctx, input }) => {
-      return ctx.db.role.findUnique({
+      return ctx.db.role.findUniqueOrThrow({
         where: { id: input.id },
         select: {
           id: true,
@@ -35,6 +37,22 @@ export const roleRouter = createTRPCRouter({
           description: true,
         },
       });
+    }),
+  getRights: protectedProcedureByRights([Right.VIEW_ROLE])
+    .input(z.object({ id: z.number() }))
+    .query(async ({ ctx, input }) => {
+      const role = await ctx.db.role.findUniqueOrThrow({
+        where: { id: input.id },
+        select: {
+          id: true,
+          rights: {
+            select: {
+              id: true,
+            },
+          },
+        },
+      });
+      return role.rights.map((right) => right.id);
     }),
   create: protectedProcedureByRights([Right.UPDATE_ROLE])
     .input(roleGeneralFormSchema)
@@ -57,6 +75,21 @@ export const roleRouter = createTRPCRouter({
         data: {
           name: input.name,
           description: input.description,
+        },
+      });
+    }),
+  updateRights: protectedProcedureByRights([Right.UPDATE_ROLE])
+    .input(roleRightFormSchema)
+    .mutation(async ({ ctx, input }) => {
+      const rightAction = input.checked ? "connect" : "disconnect";
+      await ctx.db.role.update({
+        where: { id: input.id },
+        data: {
+          rights: {
+            [rightAction]: {
+              id: input.rightId,
+            },
+          },
         },
       });
     }),

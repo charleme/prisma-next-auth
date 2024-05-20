@@ -4,6 +4,7 @@ import { Inter as FontSans } from "next/font/google";
 import { TRPCReactProvider } from "~/trpc/react";
 import { cn } from "~/lib/utils";
 import { Toaster } from "~/components/ui/toaster";
+import ClientProviders from "~/app/client-providers";
 
 export const metadata = {
   title: "Create T3 App",
@@ -30,7 +31,9 @@ export default async function RootLayout({
       )}
     >
       <body>
-        <TRPCReactProvider>{children}</TRPCReactProvider>
+        <TRPCReactProvider>
+          <ClientProviders>{children}</ClientProviders>
+        </TRPCReactProvider>
         <Toaster />
       </body>
     </html>

@@ -9,8 +9,8 @@ import {
   DropdownMenuContent,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
-import { SignOutMenuItem } from "~/app/(logged)/sign-out-menu-item";
-import { AppMenu } from "~/app/(logged)/app-menu";
+import { SignOutMenuItem } from "~/components/header/sign-out-menu-item";
+import { AppMenu } from "~/components/header/app-menu";
 
 export default async function Layout({
   children,

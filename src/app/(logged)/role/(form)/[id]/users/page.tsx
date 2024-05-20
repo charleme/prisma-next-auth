@@ -3,8 +3,9 @@ import { api } from "~/trpc/server";
 import { z } from "zod";
 import { getAuthUser } from "~/server/auth";
 import { Right } from "~/types/enum/Right";
+import { UsersRoleForm } from "~/components/role/users-role-form";
 
-export default async function UpdateRoleFormPage({
+export default async function UpdateUserRoleFormPage({
   params,
 }: {
   params: { id: string };
@@ -17,5 +18,5 @@ export default async function UpdateRoleFormPage({
 
   const isReadOnly = !authUser?.rights.includes(Right.UPDATE_ROLE);
 
-  return <GeneralRoleForm defaultValue={defaultValue} readOnly={isReadOnly} />;
+  return <UsersRoleForm defaultValue={defaultValue} readOnly={isReadOnly} />;
 }

@@ -20,7 +20,7 @@ import {
 } from "~/types/schema/auth/register";
 import { useRouter } from "next/navigation";
 import { SubmitButton } from "~/components/form/submit-button";
-import { handleFieldErrors } from "~/lib/handleFieldErrors";
+import { handleFieldErrors } from "~/lib/handle-field-errors";
 
 export function RegisterForm() {
   const { mutate: register, isPending } = api.auth.register.useMutation();

@@ -4,16 +4,16 @@ import { Loader2 } from "lucide-react";
 export const SubmitButton = ({
   children,
   isSubmitting,
-  disabled,
+  blocked,
   ...props
-}: ButtonProps & { isSubmitting: boolean }) => {
+}: ButtonProps & { isSubmitting: boolean; blocked?: boolean }) => {
   return (
     <div>
-      <Button type="submit" disabled={isSubmitting || disabled} {...props}>
+      <Button type="submit" disabled={isSubmitting || blocked} {...props}>
         {isSubmitting && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
         {children}
       </Button>
-      {disabled && (
+      {blocked && (
         <div>
           <span className="text-xs text-destructive">
             You&apos;re not allowed to submit this form.

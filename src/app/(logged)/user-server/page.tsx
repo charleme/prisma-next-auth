@@ -1,6 +1,13 @@
 import { api } from "~/trpc/server";
 import { ServerSideDataTable } from "~/app/(logged)/user-server/data-table";
 import { z } from "zod";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "~/components/ui/card";
 
 const urlParamsSchema = z.object({
   page: z.coerce.number().default(1),
@@ -25,7 +32,15 @@ export default function UserListPage({
   const users = api.user.search(parsedSearchParams);
   return (
     <div>
-      <ServerSideDataTable usersPromise={users} />
+      <Card>
+        <CardHeader>
+          <CardTitle>Users</CardTitle>
+          <CardDescription>View the app users and manage them</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <ServerSideDataTable usersPromise={users} />
+        </CardContent>
+      </Card>
     </div>
   );
 }

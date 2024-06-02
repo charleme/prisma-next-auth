@@ -8,7 +8,7 @@ const prisma = new PrismaClient();
 const generatePassword = async (password: string) => await hash(password, 10);
 async function main() {
   const users = [];
-  for (let i = 0; i < 50; i++) {
+  for (let i = 0; i < 5000; i++) {
     users.push({
       email: faker.internet.email(),
       firstName: faker.person.firstName(),

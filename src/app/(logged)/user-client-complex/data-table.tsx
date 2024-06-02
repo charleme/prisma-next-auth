@@ -10,13 +10,6 @@ import {
 } from "@tanstack/react-table";
 import { DataTable } from "~/components/data-table/data-table";
 import { getUserColumns } from "~/app/(logged)/userColumns";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/card";
 import { type DataTableFilterField } from "~/types/data-table";
 import { Role } from "~/types/enum/Role";
 import { DataTableToolbar } from "~/components/data-table/data-table-toolbar";
@@ -63,18 +56,8 @@ export function ComplexUserList({ users }: { users: UserListItem[] }) {
   ];
 
   return (
-    <div>
-      <Card>
-        <CardHeader>
-          <CardTitle>Users</CardTitle>
-          <CardDescription>View the app users and manage them</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <DataTable table={table}>
-            <DataTableToolbar table={table} filterFields={filterFields} />
-          </DataTable>
-        </CardContent>
-      </Card>
-    </div>
+    <DataTable table={table}>
+      <DataTableToolbar table={table} filterFields={filterFields} />
+    </DataTable>
   );
 }

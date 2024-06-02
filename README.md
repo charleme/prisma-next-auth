@@ -21,6 +21,7 @@ Then make sure the database is up to date:
 ```bash
 pnpm prisma db push
 pnpm prisma generate
+pnpm db:seed
 ```
 
 Then run the development server:

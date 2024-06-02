@@ -1,3 +1,5 @@
+import { type ColumnDef, type RowData } from "@tanstack/react-table";
+
 export type SearchParams = Record<string, string | string[] | undefined>;
 
 export interface Option {
@@ -7,19 +9,49 @@ export interface Option {
   withCount?: boolean;
 }
 
-export interface DataTableFilterField<TData> {
-  label: string;
-  value: keyof TData;
-  placeholder?: string;
-  options?: Option[];
-}
+export type DataTableFilterField<
+  TData extends object,
+  TVariant extends
+    keyof DataTableFilterFieldVariantsFields = keyof DataTableFilterFieldVariantsFields,
+> =
+  | ({
+      value: keyof TData;
+    } & DataTableFilterFieldVariants[TVariant])
+  | {
+      variant: "global";
+      value: "global";
+      placeholder: string;
+    };
 
-export interface DataTableFilterOption<TData> {
-  id: string;
-  label: string;
-  value: keyof TData;
-  options: Option[];
-  filterValues?: string[];
-  filterOperator?: string;
-  isMulti?: boolean;
-}
+export type ColumnDefWithViewSelectorMeta<
+  TData extends RowData,
+  TValue = unknown,
+> = ColumnDef<TData, TValue> & {
+  meta?: {
+    viewSelector: string | React.ReactNode;
+  };
+};
+
+type DataTableFilterFieldVariantsFields = {
+  input: {
+    placeholder: string;
+  };
+  multiSelect: {
+    label: string;
+    options: Option[];
+  };
+  select: {
+    label: string;
+    options: Option[];
+  };
+  // Not Implemented yet
+  // date: {
+  //   placeholder: string;
+  // };
+};
+
+type DataTableFilterFieldVariants = {
+  [K in keyof DataTableFilterFieldVariantsFields]: DataTableFilterFieldVariantsFields[K] & {
+    variant: K;
+  };
+};

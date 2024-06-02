@@ -11,6 +11,8 @@ import {
   TableRow,
 } from "~/components/ui/table";
 import { DataTablePagination } from "~/components/data-table/data-table-pagination";
+import { z } from "zod";
+import { Skeleton } from "~/components/ui/skeleton";
 
 interface DataTableProps<TData> extends React.HTMLAttributes<HTMLDivElement> {
   /**
@@ -20,12 +22,21 @@ interface DataTableProps<TData> extends React.HTMLAttributes<HTMLDivElement> {
   table: TanstackTable<TData>;
 }
 
+const metaTableSchema = z
+  .object({
+    isInitialLoading: z.boolean().optional(),
+  })
+  .optional();
+
 export function DataTable<TData>({
   table,
   children,
   className,
   ...props
 }: DataTableProps<TData>) {
+  const meta = metaTableSchema.parse(table.options.meta);
+  const isInitialLoading = !!meta?.isInitialLoading;
+
   return (
     <div
       className={cn("w-full space-y-2.5 overflow-auto", className)}
@@ -52,40 +63,59 @@ export function DataTable<TData>({
               </TableRow>
             ))}
           </TableHeader>
-          <TableBody>
-            {table.getRowModel().rows?.length ? (
-              table.getRowModel().rows.map((row) => (
-                <TableRow
-                  key={row.id}
-                  data-state={row.getIsSelected() && "selected"}
-                >
-                  {row.getVisibleCells().map((cell) => (
-                    <TableCell key={cell.id}>
-                      {flexRender(
-                        cell.column.columnDef.cell,
-                        cell.getContext(),
-                      )}
-                    </TableCell>
-                  ))}
+          {isInitialLoading ? (
+            <TableBody>
+              {Array.from({ length: table.getState().pagination.pageSize }).map(
+                (_, i) => (
+                  <TableRow key={i}>
+                    {Array.from({ length: table.getAllColumns().length }).map(
+                      (_, j) => (
+                        <TableCell key={j}>
+                          <Skeleton className="h-6 w-full" />
+                        </TableCell>
+                      ),
+                    )}
+                  </TableRow>
+                ),
+              )}
+            </TableBody>
+          ) : (
+            <TableBody>
+              {table.getRowModel().rows?.length ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow
+                    key={row.id}
+                    data-state={row.getIsSelected() && "selected"}
+                  >
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext(),
+                        )}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell
+                    colSpan={table.getAllColumns().length}
+                    className="h-24 text-center"
+                  >
+                    No results.
+                  </TableCell>
                 </TableRow>
-              ))
-            ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={table.getAllColumns().length}
-                  className="h-24 text-center"
-                >
-                  No results.
-                </TableCell>
-              </TableRow>
-            )}
-          </TableBody>
+              )}
+            </TableBody>
+          )}
         </Table>
       </div>
       <div className="flex flex-col gap-2.5">
-        {table.options.getPaginationRowModel !== undefined && (
-          <DataTablePagination table={table} />
-        )}
+        <DataTablePagination
+          table={table}
+          isInitialLoading={isInitialLoading}
+        />
       </div>
     </div>
   );

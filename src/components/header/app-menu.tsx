@@ -3,24 +3,30 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { clsx } from "clsx";
-import { useMe } from "~/hooks/use-me";
-import { hasAtLeastOneRight } from "~/lib/has-at-least-one-right";
-import { Right } from "~/types/enum/Right";
 
 export const AppMenu = () => {
   const pathname = usePathname();
-  const authUser = useMe();
 
   const menuItems = [
     {
-      link: "/user",
-      label: "Users",
+      link: "/user-client",
+      label: "Users Client",
       hide: false,
     },
     {
-      link: "/role",
-      label: "Roles",
-      hide: authUser && !hasAtLeastOneRight(authUser, [Right.VIEW_ROLE_LIST]),
+      link: "/user-client-complex",
+      label: "Users Client complex",
+      hide: false,
+    },
+    {
+      link: "/user-lazy-client",
+      label: "Users Client lazy",
+      hide: false,
+    },
+    {
+      link: "/user-server",
+      label: "Users Server",
+      hide: false,
     },
   ];
 
@@ -29,17 +35,18 @@ export const AppMenu = () => {
       {menuItems.map(
         (item) =>
           !item.hide && (
-            <Link
-              key={item.link}
-              href={item.link}
-              className={clsx(
-                "transition-colors hover:text-foreground",
-                { "text-foreground": pathname === item.link },
-                { "text-muted-foreground": pathname !== item.link },
-              )}
-            >
-              {item.label}
-            </Link>
+            <div key={item.link}>
+              <Link
+                href={item.link}
+                className={clsx(
+                  "transition-colors hover:text-foreground",
+                  { "text-foreground": pathname === item.link },
+                  { "text-muted-foreground": pathname !== item.link },
+                )}
+              >
+                {item.label}
+              </Link>
+            </div>
           ),
       )}
     </>

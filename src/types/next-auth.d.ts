@@ -8,7 +8,7 @@ interface BaseUser {
   email: string;
   firstName: string;
   lastName: string;
-  rights: number[];
+  roles: number[];
 }
 
 declare module "next-auth" {

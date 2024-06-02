@@ -2,117 +2,46 @@
 
 import * as React from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import type { DataTableFilterField } from "~/types/data-table";
 import {
-  getCoreRowModel,
-  getFacetedRowModel,
-  getFacetedUniqueValues,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable,
-  type ColumnDef,
   type ColumnFiltersState,
+  type OnChangeFn,
   type PaginationState,
   type SortingState,
-  type VisibilityState,
+  type TableOptions,
 } from "@tanstack/react-table";
 import { z } from "zod";
 
-import { useDebounce } from "~/hooks/use-debounce";
+import { usePromise } from "~/hooks/use-promise";
+import type { DataTableFilterField } from "~/types/data-table";
+import { useMemo, useState } from "react";
 
-interface UseServerDataTableProps<TData, TValue> {
-  /**
-   * The data for the table.
-   * @default []
-   * @type TData[]
-   */
-  data: TData[];
-
-  /**
-   * The columns of the table.
-   * @default []
-   * @type ColumnDef<TData, TValue>[]
-   */
-  columns: ColumnDef<TData, TValue>[];
-
-  /**
-   * The number of pages in the table.
-   * @type number
-   */
-  pageCount: number;
-
-  /**
-   * The default number of rows per page.
-   * @default 10
-   * @type number | undefined
-   * @example 20
-   */
-  defaultPerPage?: number;
-
-  /**
-   * The default sort order.
-   * @default undefined
-   * @type `${Extract<keyof TData, string | number>}.${"asc" | "desc"}` | undefined
-   * @example "createdAt.desc"
-   */
-  defaultSort?: `${Extract<keyof TData, string | number>}.${"asc" | "desc"}`;
-
-  /**
-   * Defines filter fields for the table. Supports both dynamic faceted filters and search filters.
-   * - Faceted filters are rendered when `options` are provided for a filter field.
-   * - Otherwise, search filters are rendered.
-   *
-   * The indie filter field `value` represents the corresponding column name in the database table.
-   * @default []
-   * @type { label: string, value: keyof TData, placeholder?: string, options?: { label: string, value: string, icon?: React.ComponentType<{ className?: string }> }[] }[]
-   * @example
-   * ```ts
-   * // Render a search filter
-   * const filterFields = [
-   *   { label: "Title", value: "title", placeholder: "Search titles" }
-   * ];
-   * // Render a faceted filter
-   * const filterFields = [
-   *   {
-   *     label: "Status",
-   *     value: "status",
-   *     options: [
-   *       { label: "Todo", value: "todo" },
-   *       { label: "In Progress", value: "in-progress" },
-   *       { label: "Done", value: "done" },
-   *       { label: "Canceled", value: "canceled" }
-   *     ]
-   *   }
-   * ];
-   * ```
-   */
-  filterFields?: DataTableFilterField<TData>[];
-
-  /**
-   * Enable notion like column filters.
-   * Advanced filters and column filters cannot be used at the same time.
-   * @default false
-   * @type boolean
-   */
-  enableAdvancedFilter?: boolean;
+interface UseServerDataTableProps<TData extends object> {
+  query: Promise<{
+    items: TData[];
+    count: number;
+  }>;
+  initialState?: {
+    columnFilters?: ColumnFiltersState;
+    globalFilter?: string;
+    pagination?: PaginationState;
+    sorting?: SortingState;
+  };
+  filterFields: DataTableFilterField<TData>[];
 }
 
 const schema = z.object({
+  per_page: z.coerce.number().default(10),
   page: z.coerce.number().default(1),
-  per_page: z.coerce.number().optional(),
-  sort: z.string().optional(),
+  sort_by: z.string().optional(),
+  sort_order: z.enum(["asc", "desc"]).optional(),
+  global: z.string().optional(),
 });
 
-export function useServerDataTable<TData, TValue>({
-  data,
-  columns,
-  pageCount,
-  defaultPerPage = 10,
-  defaultSort,
-  filterFields = [],
-  enableAdvancedFilter = false,
-}: UseServerDataTableProps<TData, TValue>) {
+export function useServerDataTable<TData extends object>({
+  query,
+  initialState,
+  filterFields,
+}: UseServerDataTableProps<TData>) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -120,15 +49,25 @@ export function useServerDataTable<TData, TValue>({
   // Search params
   const search = schema.parse(Object.fromEntries(searchParams));
   const page = search.page;
-  const perPage = search.per_page ?? defaultPerPage;
-  const sort = search.sort ?? defaultSort;
-  const [column, order] = sort?.split(".") ?? [];
+  const limit = search.per_page ?? initialState?.pagination?.pageSize ?? 10;
+  const sortColumn = search.sort_by ?? initialState?.sorting?.[0]?.id;
+  const sortOrder =
+    search.sort_order ?? initialState?.sorting?.[0]?.desc ? "desc" : "asc";
+  const initialGlobalFilter = search.global ?? initialState?.globalFilter ?? "";
 
-  // Memoize computation of searchableColumns and filterableColumns
-  const { searchableColumns, filterableColumns } = React.useMemo(() => {
+  const { result, isInitialLoading } = usePromise(query);
+  const items = useMemo(() => result?.items ?? [], [result]);
+  const count = useMemo(() => result?.count ?? 0, [result]);
+
+  // Split the columns into unique value columns and multi value columns to know which values should be split by dot
+  const { uniqueValueColumns, multiValueColumns } = React.useMemo(() => {
     return {
-      searchableColumns: filterFields.filter((field) => !field.options),
-      filterableColumns: filterFields.filter((field) => field.options),
+      uniqueValueColumns: filterFields.filter(
+        (field) => field.variant === "input",
+      ),
+      multiValueColumns: filterFields.filter(
+        (field) => field.variant === "multiSelect",
+      ),
     };
   }, [filterFields]);
 
@@ -138,7 +77,7 @@ export function useServerDataTable<TData, TValue>({
       const newSearchParams = new URLSearchParams(searchParams?.toString());
 
       for (const [key, value] of Object.entries(params)) {
-        if (value === null) {
+        if (value === null || value === undefined) {
           newSearchParams.delete(key);
         } else {
           newSearchParams.set(key, String(value));
@@ -154,10 +93,10 @@ export function useServerDataTable<TData, TValue>({
   const initialColumnFilters: ColumnFiltersState = React.useMemo(() => {
     return Array.from(searchParams.entries()).reduce<ColumnFiltersState>(
       (filters, [key, value]) => {
-        const filterableColumn = filterableColumns.find(
+        const filterableColumn = multiValueColumns.find(
           (column) => column.value === key,
         );
-        const searchableColumn = searchableColumns.find(
+        const searchableColumn = uniqueValueColumns.find(
           (column) => column.value === key,
         );
 
@@ -169,7 +108,7 @@ export function useServerDataTable<TData, TValue>({
         } else if (searchableColumn) {
           filters.push({
             id: key,
-            value: [value],
+            value,
           });
         }
 
@@ -177,21 +116,17 @@ export function useServerDataTable<TData, TValue>({
       },
       [],
     );
-  }, [filterableColumns, searchableColumns, searchParams]);
+  }, [multiValueColumns, uniqueValueColumns, searchParams]);
 
-  // Table states
-  const [rowSelection, setRowSelection] = React.useState({});
-  const [columnVisibility, setColumnVisibility] =
-    React.useState<VisibilityState>({});
   const [columnFilters, setColumnFilters] =
-    React.useState<ColumnFiltersState>(initialColumnFilters);
-
-  // Handle server-side pagination
-  const [{ pageIndex, pageSize }, setPagination] =
-    React.useState<PaginationState>({
+    useState<ColumnFiltersState>(initialColumnFilters);
+  const [globalFilter, setGlobalFilter] = useState<string>(initialGlobalFilter);
+  const [{ pageIndex, pageSize }, setPagination] = useState<PaginationState>(
+    initialState?.pagination ?? {
       pageIndex: page - 1,
-      pageSize: perPage,
-    });
+      pageSize: limit,
+    },
+  );
 
   const pagination = React.useMemo(
     () => ({
@@ -201,65 +136,64 @@ export function useServerDataTable<TData, TValue>({
     [pageIndex, pageSize],
   );
 
-  React.useEffect(() => {
+  const [sorting, setSorting] = useState<SortingState>(
+    sortColumn ? [{ id: sortColumn, desc: sortOrder === "desc" }] : [],
+  );
+
+  const [isMounted, setIsMounted] = useState(false);
+
+  const onPaginationChange: OnChangeFn<PaginationState> = (newPagination) => {
+    setPagination(newPagination);
+
+    const newPaginationValue =
+      typeof newPagination === "function"
+        ? newPagination(pagination)
+        : newPagination;
+
+    const pageIndex = newPaginationValue.pageIndex;
+    const perPage = newPaginationValue.pageSize;
+
     router.push(
       `${pathname}?${createQueryString({
-        page: pageIndex + 1,
-        per_page: pageSize,
+        page: pageIndex !== 0 ? pageIndex + 1 : null,
+        per_page: perPage,
       })}`,
       {
         scroll: false,
       },
     );
+  };
 
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [pageIndex, pageSize]);
+  const onSortingChange: OnChangeFn<SortingState> = (newSorting) => {
+    const newSortingValue =
+      typeof newSorting === "function" ? newSorting(sorting) : newSorting;
+    setSorting(newSortingValue);
 
-  // Handle server-side sorting
-  const [sorting, setSorting] = React.useState<SortingState>([
-    {
-      id: column ?? "",
-      desc: order === "desc",
-    },
-  ]);
-
-  React.useEffect(() => {
+    const sortBy = newSortingValue[0]?.id ?? null;
+    const sortOrder =
+      newSortingValue[0]?.id && newSortingValue[0]?.desc ? "desc" : null;
+    setPagination((current) => ({ ...current, pageIndex: 0 }));
     router.push(
       `${pathname}?${createQueryString({
-        page,
-        sort: sorting[0]?.id
-          ? `${sorting[0]?.id}.${sorting[0]?.desc ? "desc" : "asc"}`
-          : null,
+        sort_by: sortBy,
+        sort_order: sortOrder,
+        page: null,
       })}`,
     );
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [sorting]);
+  };
 
-  // Handle server-side filtering
-  const debouncedSearchableColumnFilters = JSON.parse(
-    useDebounce(
-      JSON.stringify(
-        columnFilters.filter((filter) => {
-          return searchableColumns.find((column) => column.value === filter.id);
-        }),
-      ),
-      500,
-    ),
-  ) as ColumnFiltersState;
-
-  const filterableColumnFilters = columnFilters.filter((filter) => {
-    return filterableColumns.find((column) => column.value === filter.id);
+  const multiValueColumnFilters = columnFilters.filter((filter) => {
+    return multiValueColumns.find((column) => column.value === filter.id);
   });
 
-  const [mounted, setMounted] = React.useState(false);
+  const uniqueValueColumnFilters = columnFilters.filter((filter) => {
+    return uniqueValueColumns.find((column) => column.value === filter.id);
+  });
 
   React.useEffect(() => {
-    // Opt out when advanced filter is enabled, because it contains additional params
-    if (enableAdvancedFilter) return;
-
-    // Prevent resetting the page on initial render
-    if (!mounted) {
-      setMounted(true);
+    // avoid to trigger on first mount
+    if (!isMounted) {
+      setIsMounted(true);
       return;
     }
 
@@ -268,31 +202,37 @@ export function useServerDataTable<TData, TValue>({
       page: 1,
     };
 
-    // Handle debounced searchable column filters
-    for (const column of debouncedSearchableColumnFilters) {
+    for (const column of uniqueValueColumnFilters) {
       if (typeof column.value === "string") {
         Object.assign(newParamsObject, {
           [column.id]: column.value,
         });
+        continue;
       }
+
+      throw new Error(
+        "Invalid unique column filter value: " + column.value?.toString(),
+      );
     }
 
     // Handle filterable column filters
-    for (const column of filterableColumnFilters) {
+    for (const column of multiValueColumnFilters) {
       if (typeof column.value === "object" && Array.isArray(column.value)) {
         Object.assign(newParamsObject, { [column.id]: column.value.join(".") });
+        continue;
       }
+      throw new Error(
+        "Invalid multi column filter value: " + column.value?.toString(),
+      );
     }
 
     // Remove deleted values
     for (const key of searchParams.keys()) {
       if (
-        (searchableColumns.find((column) => column.value === key) &&
-          !debouncedSearchableColumnFilters.find(
-            (column) => column.id === key,
-          )) ??
-        (filterableColumns.find((column) => column.value === key) &&
-          !filterableColumnFilters.find((column) => column.id === key))
+        (uniqueValueColumns.find((column) => column.value === key) &&
+          !uniqueValueColumnFilters.find((column) => column.id === key)) ??
+        (multiValueColumns.find((column) => column.value === key) &&
+          !multiValueColumnFilters.find((column) => column.id === key))
       ) {
         Object.assign(newParamsObject, { [key]: null });
       }
@@ -301,43 +241,53 @@ export function useServerDataTable<TData, TValue>({
     // After cumulating all the changes, push new params
     router.push(`${pathname}?${createQueryString(newParamsObject)}`);
 
-    table.setPageIndex(0);
+    setPagination((current) => ({ ...current, pageIndex: 0 }));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    JSON.stringify(debouncedSearchableColumnFilters),
+    JSON.stringify(uniqueValueColumnFilters),
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    JSON.stringify(filterableColumnFilters),
+    JSON.stringify(multiValueColumnFilters),
   ]);
 
-  const table = useReactTable({
-    data,
-    columns,
-    pageCount: pageCount ?? -1,
+  const onGlobalFilterChange: OnChangeFn<string> = (newGlobalFilter) => {
+    const newGlobalFilterValue =
+      typeof newGlobalFilter === "function"
+        ? newGlobalFilter(globalFilter)
+        : newGlobalFilter;
+
+    if (newGlobalFilterValue === globalFilter) return;
+
+    setGlobalFilter(newGlobalFilterValue);
+
+    setPagination((current) => ({ ...current, pageIndex: 0 }));
+    router.push(
+      `${pathname}?${createQueryString({
+        global: newGlobalFilterValue !== "" ? newGlobalFilterValue : null,
+        page: null,
+      })}`,
+    );
+  };
+
+  return {
+    data: items,
+    rowCount: count,
     state: {
       pagination,
       sorting,
-      columnVisibility,
-      rowSelection,
       columnFilters,
+      globalFilter,
     },
-    enableRowSelection: true,
-    onRowSelectionChange: setRowSelection,
-    onPaginationChange: setPagination,
-    onSortingChange: setSorting,
+    meta: {
+      isInitialLoading: isInitialLoading && items.length === 0,
+    },
+    onPaginationChange,
+    onSortingChange,
     onColumnFiltersChange: setColumnFilters,
-    onColumnVisibilityChange: setColumnVisibility,
-    getCoreRowModel: getCoreRowModel(),
-    getFilteredRowModel: getFilteredRowModel(),
-    getPaginationRowModel: getPaginationRowModel(),
-    getSortedRowModel: getSortedRowModel(),
-    getFacetedRowModel: getFacetedRowModel(),
-    getFacetedUniqueValues: getFacetedUniqueValues(),
+    onGlobalFilterChange,
     manualPagination: true,
     manualSorting: true,
     manualFiltering: true,
-  });
-
-  return { table };
+  } satisfies Partial<TableOptions<TData>>;
 }

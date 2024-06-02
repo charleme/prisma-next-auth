@@ -20,19 +20,10 @@ model User {
   roles Role[]
 }
 
-model Right {
-  id          Int    @id @default(autoincrement())
-  name        String @unique
-  description String
-
-  roles Role[]
-}
-
 model Role {
   id          Int    @id @default(autoincrement())
   name        String @unique
   description String
 
-  rights Right[]
-  users  User[]
+  users User[]
 }

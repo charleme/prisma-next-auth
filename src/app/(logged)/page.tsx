@@ -2,7 +2,7 @@ import { redirect } from "next/navigation";
 import { getAuthUser } from "~/server/auth";
 
 export default async function LoginPage() {
-  const user = await getAuthUser();
+  const { user } = await getAuthUser();
 
   if (!user) {
     redirect("/login");

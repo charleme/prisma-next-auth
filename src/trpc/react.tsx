@@ -20,6 +20,7 @@ import { type AppRouter } from "~/server/api/root";
 import { useToast } from "~/components/ui/use-toast";
 import { type TrpcFormatedError } from "~/server/api/trpc";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+import { useRouter } from "next/navigation";
 
 const createQueryClient = (conf?: {
   queryCache?: QueryCache;
@@ -57,6 +58,7 @@ export type RouterOutputs = inferRouterOutputs<AppRouter>;
 
 export function TRPCReactProvider(props: { children: React.ReactNode }) {
   const { toast } = useToast();
+  const router = useRouter();
 
   const toastUnkwownError = () =>
     toast({
@@ -65,12 +67,14 @@ export function TRPCReactProvider(props: { children: React.ReactNode }) {
       variant: "destructive",
     });
 
-  const unauthorizedError = () =>
+  const unauthorizedError = () => {
     toast({
       title: "Unauthorized",
       description: "You need to be logged in to perform this action",
       variant: "destructive",
     });
+    router.push("/login");
+  };
 
   const forbiddenError = () =>
     toast({
@@ -130,6 +134,7 @@ export function TRPCReactProvider(props: { children: React.ReactNode }) {
             (op.direction === "down" && op.result instanceof Error),
         }),
         unstable_httpBatchStreamLink({
+          fetch: (input, init) => fetch(input, { cache: "no-store", ...init }),
           transformer: SuperJSON,
           url: getBaseUrl() + "/api/trpc",
           headers: () => {

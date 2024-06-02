@@ -17,23 +17,25 @@ export default async function Layout({
 }: {
   children: React.ReactNode;
 }) {
-  const user = await getAuthUser();
+  const { user } = await getAuthUser();
 
   if (!user) {
     redirect("/login");
   }
 
   return (
-    <div className="flex min-h-screen w-full flex-col">
-      <header className="sticky top-0 flex h-16 items-center gap-4 border-b px-4 md:px-6">
+    <div className="flex min-h-screen w-full flex-col pb-4">
+      <header className="sticky top-0 z-10 flex h-16 items-center gap-4 border-b bg-white px-4 md:px-6">
         <nav className="hidden flex-col gap-6 text-lg font-medium md:flex md:flex-row md:items-center md:gap-5 md:text-sm lg:gap-6">
-          <Link
-            href="/"
-            className="flex items-center gap-2 text-lg font-semibold md:text-base"
-          >
-            <Package2 className="h-6 w-6" />
-            <span className="sr-only">Acme Inc</span>
-          </Link>
+          <div>
+            <Link
+              href="/"
+              className="flex items-center gap-2 text-lg font-semibold md:text-base"
+            >
+              <Package2 className="h-6 w-6" />
+              <span className="sr-only">Acme Inc</span>
+            </Link>
+          </div>
           <AppMenu />
         </nav>
         <Sheet>
@@ -86,7 +88,7 @@ export default async function Layout({
             </nav>
           </SheetContent>
         </Sheet>
-        <div className="flex w-full items-center justify-end gap-4 md:ml-auto md:gap-2 lg:gap-4">
+        <div className="ml-auto flex items-center justify-end gap-4 md:gap-2 lg:gap-4">
           {`${user.firstName} ${user.lastName}`}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>

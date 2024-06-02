@@ -1,22 +1,9 @@
 import { createTRPCRouter, publicProcedure } from "~/server/api/trpc";
-import { hash } from "bcrypt";
 import { registerSchema } from "~/types/schema/auth/register";
+import { register } from "~/server/handlers/auth/auth";
 
 export const authRouter = createTRPCRouter({
   register: publicProcedure
     .input(registerSchema)
-    .mutation(
-      async ({ input: { email, password, lastName, firstName }, ctx }) => {
-        const hashedPassword = await hash(password, 10);
-
-        await ctx.db.user.create({
-          data: {
-            email,
-            password: hashedPassword,
-            firstName,
-            lastName,
-          },
-        });
-      },
-    ),
+    .mutation(async ({ input, ctx }) => await register({ db: ctx.db, input })),
 });

@@ -11,9 +11,9 @@ import superjson from "superjson";
 
 import { db } from "~/server/db";
 import { getServerAuthSession } from "~/server/auth";
-import { handleErrors } from "~/server/api/handlers/error";
+import { handleErrors } from "~/server/handlers/error";
 import { type DefaultErrorShape } from "@trpc/server/unstable-core-do-not-import";
-import { type Right } from "~/types/enum/Right";
+import { type Role } from "~/types/enum/Role";
 
 /**
  * 1. CONTEXT
@@ -114,10 +114,22 @@ export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
   });
 });
 
-export const protectedProcedureByRights = (rightIds: Right[]) => {
+export const protectedProcedureByRole = (roleId: Role) => {
   return protectedProcedure.use(async ({ ctx, next }) => {
-    const hasRight = rightIds.some((rightId) =>
-      ctx.session.user.rights.includes(rightId),
+    if (!ctx.session.user.roles.includes(roleId)) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+      });
+    }
+
+    return next();
+  });
+};
+
+export const protectedProcedureByRoles = (roleIds: Role[]) => {
+  return protectedProcedure.use(async ({ ctx, next }) => {
+    const hasRight = roleIds.some((roleId) =>
+      ctx.session.user.roles.includes(roleId),
     );
 
     if (!hasRight) {

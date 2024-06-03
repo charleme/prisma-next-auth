@@ -1,6 +1,5 @@
 "use client";
 
-import { type UserListItem } from "~/types/query/user/list";
 import {
   getCoreRowModel,
   getFilteredRowModel,
@@ -16,6 +15,7 @@ import { DataTableToolbar } from "~/components/data-table/data-table-toolbar";
 import { type api } from "~/trpc/server";
 import React from "react";
 import { useServerDataTable } from "~/hooks/use-server-data-table";
+import { type UserSearchItem } from "~/types/query/user/search";
 
 export function ServerSideDataTable({
   usersPromise,
@@ -24,7 +24,7 @@ export function ServerSideDataTable({
 }) {
   const columns = getUserColumns();
 
-  const filterFields: DataTableFilterField<UserListItem>[] = [
+  const filterFields: DataTableFilterField<UserSearchItem>[] = [
     {
       variant: "global",
       value: "global",

@@ -47,7 +47,7 @@ export function useLazyDataTable<TData>({
   );
   const [pagination, setPagination] = useState<PaginationState>(
     initialState?.pagination ?? {
-      pageIndex: 1,
+      pageIndex: 0,
       pageSize: 10,
     },
   );
@@ -67,7 +67,7 @@ export function useLazyDataTable<TData>({
 
   const query = useQuery({
     per_page: pagination.pageSize,
-    page: pagination.pageIndex,
+    page: pagination.pageIndex + 1,
     global: globalFilter,
     sort_by: sorting[0]?.id,
     sort_order: sorting[0]?.desc ? "desc" : "asc",
@@ -80,7 +80,7 @@ export function useLazyDataTable<TData>({
     setColumnFilters(newColumnFilters);
     setPagination({
       ...pagination,
-      pageIndex: 1,
+      pageIndex: 0,
     });
   };
 
@@ -88,7 +88,7 @@ export function useLazyDataTable<TData>({
     setGlobalFilter(newGlobalFilter);
     setPagination({
       ...pagination,
-      pageIndex: 1,
+      pageIndex: 0,
     });
   };
 
@@ -96,7 +96,7 @@ export function useLazyDataTable<TData>({
     setSorting(newSorting);
     setPagination({
       ...pagination,
-      pageIndex: 1,
+      pageIndex: 0,
     });
   };
 

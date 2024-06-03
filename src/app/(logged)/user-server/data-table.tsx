@@ -1,6 +1,5 @@
 "use client";
 
-import { type UserListItem } from "~/types/query/user/list";
 import {
   getCoreRowModel,
   getFilteredRowModel,
@@ -10,19 +9,13 @@ import {
 } from "@tanstack/react-table";
 import { DataTable } from "~/components/data-table/data-table";
 import { getUserColumns } from "~/app/(logged)/userColumns";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "~/components/ui/card";
 import { type DataTableFilterField } from "~/types/data-table";
 import { Role } from "~/types/enum/Role";
 import { DataTableToolbar } from "~/components/data-table/data-table-toolbar";
 import { type api } from "~/trpc/server";
 import React from "react";
 import { useServerDataTable } from "~/hooks/use-server-data-table";
+import { type UserSearchItem } from "~/types/query/user/search";
 
 export function ServerSideDataTable({
   usersPromise,
@@ -31,7 +24,7 @@ export function ServerSideDataTable({
 }) {
   const columns = getUserColumns();
 
-  const filterFields: DataTableFilterField<UserListItem>[] = [
+  const filterFields: DataTableFilterField<UserSearchItem>[] = [
     {
       variant: "global",
       value: "global",
@@ -75,18 +68,8 @@ export function ServerSideDataTable({
   });
 
   return (
-    <div>
-      <Card>
-        <CardHeader>
-          <CardTitle>Users</CardTitle>
-          <CardDescription>View the app users and manage them</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <DataTable table={table}>
-            <DataTableToolbar table={table} filterFields={filterFields} />
-          </DataTable>
-        </CardContent>
-      </Card>
-    </div>
+    <DataTable table={table}>
+      <DataTableToolbar table={table} filterFields={filterFields} />
+    </DataTable>
   );
 }

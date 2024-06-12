@@ -46,10 +46,7 @@ export function DataTableViewOptions<TData>({
         <DropdownMenuSeparator />
         {table
           .getAllColumns()
-          .filter(
-            (column) =>
-              typeof column.accessorFn !== "undefined" && column.getCanHide(),
-          )
+          .filter((column) => column.getCanHide())
           .map((column) => {
             const meta = metaSchema.parse(column.columnDef.meta);
             const label = meta?.viewSelector ?? column.id;

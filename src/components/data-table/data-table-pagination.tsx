@@ -25,7 +25,7 @@ interface DataTablePaginationProps<TData> {
 
 export function DataTablePagination<TData>({
   table,
-  pageSizeOptions = [10, 20, 30, 40, 50],
+  pageSizeOptions = [10, 25, 50, 100],
   isInitialLoading,
 }: DataTablePaginationProps<TData>) {
   if (isInitialLoading) {
@@ -51,6 +51,8 @@ export function DataTablePagination<TData>({
     );
   }
 
+  const rowPerPageSelectId = "per-page-select";
+
   return (
     <div className="flex w-full flex-col-reverse items-center justify-between gap-4 overflow-auto p-1 sm:flex-row sm:gap-8">
       <div>
@@ -68,7 +70,10 @@ export function DataTablePagination<TData>({
       {table.options.getPaginationRowModel !== undefined && (
         <div className="flex flex-col-reverse items-center gap-4 sm:flex-row sm:gap-6 lg:gap-8">
           <div className="flex items-center space-x-2">
-            <p className="whitespace-nowrap text-sm font-medium">
+            <p
+              className="whitespace-nowrap text-sm font-medium"
+              id={rowPerPageSelectId}
+            >
               Rows per page
             </p>
             <Select
@@ -77,7 +82,10 @@ export function DataTablePagination<TData>({
                 table.setPageSize(Number(value));
               }}
             >
-              <SelectTrigger className="h-8 w-[4.5rem]">
+              <SelectTrigger
+                className="h-8 w-[4.5rem]"
+                aria-labelledby={rowPerPageSelectId}
+              >
                 <SelectValue
                   placeholder={table.getState().pagination.pageSize}
                 />

@@ -12,45 +12,43 @@ interface DataTableColumnHeaderButtonProps<TData, TValue>
   onClick?: () => void;
 }
 
-function DataColumnHeaderButtonInner<TData, TValue>(
-  { column, title, className }: DataTableColumnHeaderButtonProps<TData, TValue>,
-  ref?: React.ForwardedRef<HTMLButtonElement>,
+export function DataColumnHeaderButtonInner<TData, TValue>(
+  {
+    column,
+    title,
+    className,
+    onClick,
+  }: DataTableColumnHeaderButtonProps<TData, TValue>,
+  ref: React.ForwardedRef<HTMLButtonElement>,
 ) {
-  const isSortedHandleByParent = !!ref;
-
-  if (
-    !column.getCanSort() &&
-    (!column.getCanHide() || !isSortedHandleByParent)
-  ) {
+  if (!column.getCanSort() && !column.getCanHide()) {
     return <div className={cn(className)}>{title}</div>;
   }
 
   return (
-    <div className={cn("flex items-center space-x-2", className)}>
-      <Button
-        ref={ref}
-        aria-label={
-          column.getIsSorted() === "desc"
-            ? "Sorted descending. Click to sort ascending."
-            : column.getIsSorted() === "asc"
-              ? "Sorted ascending. Click to sort descending."
-              : "Not sorted. Click to sort ascending."
-        }
-        variant="ghost"
-        size="sm"
-        className="-ml-3 h-8 data-[state=open]:bg-accent"
-        onClick={() => !isSortedHandleByParent && column.toggleSorting()}
-      >
-        <span>{title}</span>
-        {column.getCanSort() && column.getIsSorted() === "desc" ? (
-          <ArrowDown className="ml-2 size-4" aria-hidden="true" />
-        ) : column.getIsSorted() === "asc" ? (
-          <ArrowUp className="ml-2 size-4" aria-hidden="true" />
-        ) : (
-          <ChevronsUpDown className="ml-2 size-4" aria-hidden="true" />
-        )}
-      </Button>
-    </div>
+    <Button
+      ref={ref}
+      aria-label={
+        column.getIsSorted() === "desc"
+          ? "Sorted descending. Click to sort ascending."
+          : column.getIsSorted() === "asc"
+            ? "Sorted ascending. Click to sort descending."
+            : "Not sorted. Click to sort ascending."
+      }
+      variant="ghost"
+      size="sm"
+      className="-ml-3 h-8 data-[state=open]:bg-accent"
+      onClick={() => onClick?.()}
+    >
+      <span>{title}</span>
+      {column.getCanSort() && column.getIsSorted() === "desc" ? (
+        <ArrowDown className="ml-2 size-4" aria-hidden="true" />
+      ) : column.getIsSorted() === "asc" ? (
+        <ArrowUp className="ml-2 size-4" aria-hidden="true" />
+      ) : (
+        <ChevronsUpDown className="ml-2 size-4" aria-hidden="true" />
+      )}
+    </Button>
   );
 }
 

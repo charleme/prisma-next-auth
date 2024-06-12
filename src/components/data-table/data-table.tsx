@@ -13,6 +13,7 @@ import {
 import { DataTablePagination } from "~/components/data-table/data-table-pagination";
 import { z } from "zod";
 import { Skeleton } from "~/components/ui/skeleton";
+import { clsx } from "clsx";
 
 interface DataTableProps<TData> extends React.HTMLAttributes<HTMLDivElement> {
   /**
@@ -25,6 +26,7 @@ interface DataTableProps<TData> extends React.HTMLAttributes<HTMLDivElement> {
 const metaTableSchema = z
   .object({
     isInitialLoading: z.boolean().optional(),
+    isLoading: z.boolean().optional(),
   })
   .optional();
 
@@ -36,6 +38,7 @@ export function DataTable<TData>({
 }: DataTableProps<TData>) {
   const meta = metaTableSchema.parse(table.options.meta);
   const isInitialLoading = !!meta?.isInitialLoading;
+  const isLoading = !!meta?.isLoading;
 
   return (
     <div
@@ -80,7 +83,7 @@ export function DataTable<TData>({
               )}
             </TableBody>
           ) : (
-            <TableBody>
+            <TableBody className={clsx({ "opacity-60": isLoading })}>
               {table.getRowModel().rows?.length ? (
                 table.getRowModel().rows.map((row) => (
                   <TableRow

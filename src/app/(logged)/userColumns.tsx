@@ -39,6 +39,7 @@ export const getUserColumns =
         header: ({ column }) => (
           <DataTableColumnHeader column={column} title="First Name" />
         ),
+        enableHiding: false,
       },
       {
         meta: { viewSelector: "Last Name" },

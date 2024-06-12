@@ -19,9 +19,8 @@ pnpm install
 Then make sure the database is up to date:
 
 ```bash
-pnpm prisma db push
 pnpm prisma generate
-pnpm db:seed
+pnpm prisma migrate reset
 ```
 
 Then run the development server:
@@ -29,3 +28,16 @@ Then run the development server:
 ```bash
 pnpm dev
 ```
+
+## TODO
+
+- [ ] Create Component
+  - [ ] SelectAllDataTableRow
+  - [ ] SelectDataTableRow
+  - [ ] Main Content Layout (Title, Subtitle, Content)
+- [ ] I18n
+- [ ] Storybook
+- [ ] Tests
+- [ ] Documentation
+- [ ] Create/Update/Delete User
+- [ ] User Activity Log

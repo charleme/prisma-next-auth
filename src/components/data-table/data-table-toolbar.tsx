@@ -24,10 +24,6 @@ export function DataTableToolbar<TData extends object>({
   className,
   ...props
 }: DataTableToolbarProps<TData>) {
-  const isFiltered =
-    table.getState().columnFilters.length > 0 ||
-    table.getState().globalFilter !== "";
-
   return (
     <div
       className={cn(
@@ -83,20 +79,18 @@ export function DataTableToolbar<TData extends object>({
             );
           }
         })}
-        {isFiltered && (
-          <Button
-            aria-label="Reset filters"
-            variant="ghost"
-            className="h-8 px-2 lg:px-3"
-            onClick={() => {
-              table.resetColumnFilters();
-              table.resetGlobalFilter();
-            }}
-          >
-            Reset
-            <X className="ml-2 size-4" aria-hidden="true" />
-          </Button>
-        )}
+        <Button
+          aria-label="Reset filters"
+          variant="ghost"
+          className="h-8 px-2 lg:px-3"
+          onClick={() => {
+            table.resetColumnFilters();
+            table.resetGlobalFilter();
+          }}
+        >
+          Reset
+          <X className="ml-2 size-4" aria-hidden="true" />
+        </Button>
       </div>
       <div className="flex items-center gap-2">
         {children}

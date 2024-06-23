@@ -13,15 +13,16 @@ import { type DataTableFilterField } from "~/types/data-table";
 import { Role } from "~/types/enum/Role";
 import { DataTableToolbar } from "~/components/data-table/data-table-toolbar";
 import { type api } from "~/trpc/server";
-import React from "react";
+import React, { type PropsWithChildren } from "react";
 import { useServerDataTable } from "~/hooks/use-server-data-table";
 import { type UserSearchItem } from "~/types/query/user/search";
 
 export function ServerSideDataTable({
   usersPromise,
-}: {
+  children,
+}: PropsWithChildren<{
   usersPromise: ReturnType<typeof api.user.search>;
-}) {
+}>) {
   const columns = getUserColumns();
 
   const filterFields: DataTableFilterField<UserSearchItem>[] = [
@@ -69,7 +70,9 @@ export function ServerSideDataTable({
 
   return (
     <DataTable table={table}>
-      <DataTableToolbar table={table} filterFields={filterFields} />
+      <DataTableToolbar table={table} filterFields={filterFields}>
+        {children}
+      </DataTableToolbar>
     </DataTable>
   );
 }

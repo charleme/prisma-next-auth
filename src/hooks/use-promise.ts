@@ -7,6 +7,7 @@ export const usePromise = <T>(promise: Promise<T>) => {
 
   useEffect(() => {
     setIsLoading(true);
+
     void promise.then((data) => {
       setResult(data);
       setIsInitialLoading(false);

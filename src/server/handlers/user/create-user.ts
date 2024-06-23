@@ -1,12 +1,12 @@
 import { type RegisterFormData } from "~/types/schema/auth/register";
-import { type PrismaClient } from "@prisma/client";
 import { hash } from "bcrypt";
+import { type DbClient } from "~/server/db";
 
 export const register = async ({
   db,
   input,
 }: {
-  db: PrismaClient;
+  db: DbClient;
   input: RegisterFormData;
 }) => {
   const hashedPassword = await hash(input.password, 10);

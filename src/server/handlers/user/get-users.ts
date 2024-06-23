@@ -1,13 +1,13 @@
-import { type Prisma, type PrismaClient } from "@prisma/client";
-import { paginator } from "~/server/handlers/utils/paginator";
+import { type Prisma } from "@prisma/client";
 import { type PaginationProps } from "~/types/schema/list/pagination";
 import { type SearchUserFilter } from "~/types/schema/user/search";
+import { type ExtArgs, type DbClient } from "~/server/db";
 
-export function listUser<Select extends Prisma.UserSelect>({
+export function listUser<Select extends Prisma.UserSelect<ExtArgs>>({
   db,
   select,
 }: {
-  db: PrismaClient;
+  db: DbClient;
   select: Select;
 }) {
   return db.user.findMany({
@@ -15,20 +15,18 @@ export function listUser<Select extends Prisma.UserSelect>({
   });
 }
 
-export function searchUser<Select extends Prisma.UserSelect>({
+export function searchUser<Select extends Prisma.UserSelect<ExtArgs>>({
   db,
   select,
   filters,
   paginationProps,
 }: {
-  db: PrismaClient;
+  db: DbClient;
   select: Select;
   paginationProps: PaginationProps;
   filters: SearchUserFilter;
 }) {
-  return paginator(
-    db,
-    "user",
+  return db.user.paginate(
     {
       select: select ?? {},
       where: {

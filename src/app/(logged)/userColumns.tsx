@@ -1,38 +1,13 @@
 import { type UserListItem } from "~/types/query/user/list";
 import { RoleBadge } from "~/components/role/role-badge";
 import { DataTableColumnHeader } from "~/components/data-table/data-column-header";
-import { Checkbox } from "~/components/ui/checkbox";
 import { type ColumnDefWithViewSelectorMeta } from "~/types/data-table";
+import { SELECTION_COLUMN } from "~/types/constants/table";
 
 export const getUserColumns =
   (): ColumnDefWithViewSelectorMeta<UserListItem>[] => {
     return [
-      {
-        id: "selection",
-        header: ({ table }) => (
-          <Checkbox
-            checked={
-              table.getIsAllPageRowsSelected() ||
-              (table.getIsSomePageRowsSelected() && "indeterminate")
-            }
-            onCheckedChange={(value) =>
-              table.toggleAllPageRowsSelected(!!value)
-            }
-            aria-label="Select all"
-          />
-        ),
-        cell: ({ row }) => {
-          return (
-            <Checkbox
-              checked={row.getIsSelected()}
-              onCheckedChange={(value) => row.toggleSelected(!!value)}
-              aria-label="Select row"
-            />
-          );
-        },
-        enableSorting: false,
-        enableHiding: false,
-      },
+      SELECTION_COLUMN,
       {
         accessorKey: "firstName",
         meta: { viewSelector: "First Name" },

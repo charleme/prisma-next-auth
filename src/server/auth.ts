@@ -4,6 +4,10 @@ import { db } from "~/server/db";
 import { getServerSession, type NextAuthOptions } from "next-auth";
 import { hasAtLeastOneRole, hasRole } from "~/lib/has-role";
 import { type Role } from "~/types/enum/Role";
+import {
+  getUserByEmailOrThrow,
+  getUserByIdOrThrow,
+} from "~/server/handlers/user/get-user";
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -22,8 +26,9 @@ export const authOptions: NextAuthOptions = {
         password: {},
       },
       async authorize(credentials, _) {
-        const user = await db.user.findUnique({
-          where: { email: credentials?.email },
+        const user = await getUserByEmailOrThrow({
+          email: credentials?.email ?? "",
+          db,
           select: {
             id: true,
             email: true,
@@ -61,8 +66,9 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user, trigger }) {
       // refresh token
       if (trigger === "update") {
-        const updatedUser = await db.user.findUniqueOrThrow({
-          where: { id: user?.id || token.id },
+        const updatedUser = await getUserByIdOrThrow({
+          db,
+          id: user?.id || token.id,
           select: {
             id: true,
             email: true,

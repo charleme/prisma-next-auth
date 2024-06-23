@@ -8,10 +8,14 @@ import {
   CardHeader,
   CardTitle,
 } from "~/components/ui/card";
+import { getPerPageStringifyOptions } from "~/types/schema/list/pagination";
+import { DEFAULT_TABLE_PAGE_SIZES } from "~/types/constants/table";
 
 const urlParamsSchema = z.object({
   page: z.coerce.number().default(1),
-  per_page: z.coerce.number().default(10),
+  per_page: getPerPageStringifyOptions(DEFAULT_TABLE_PAGE_SIZES)
+    .optional()
+    .default("10"),
   sort_by: z.string().optional(),
   sort_order: z.enum(["asc", "desc"]).optional(),
   global: z.string().optional(),

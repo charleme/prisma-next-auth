@@ -1,5 +1,5 @@
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
-import { listUser, searchUser } from "~/server/handlers/user/getUsers";
+import { listUser, searchUser } from "~/server/handlers/user/get-users";
 import { searchUserSchema } from "~/types/schema/user/search";
 
 export const userRouter = createTRPCRouter({

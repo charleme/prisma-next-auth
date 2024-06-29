@@ -14,6 +14,7 @@ import { getServerAuthSession } from "~/server/auth";
 import { handleErrors } from "~/server/handlers/error";
 import { type DefaultErrorShape } from "@trpc/server/unstable-core-do-not-import";
 import { type Role } from "~/types/enum/Role";
+import { type User } from "next-auth";
 
 /**
  * 1. CONTEXT
@@ -114,19 +115,7 @@ export const protectedProcedure = t.procedure.use(async ({ ctx, next }) => {
   });
 });
 
-export const protectedProcedureByRole = (roleId: Role) => {
-  return protectedProcedure.use(async ({ ctx, next }) => {
-    if (!ctx.session.user.roles.includes(roleId)) {
-      throw new TRPCError({
-        code: "FORBIDDEN",
-      });
-    }
-
-    return next();
-  });
-};
-
-export const protectedProcedureByRoles = (roleIds: Role[]) => {
+export const protectedProcedureByRole = (...roleIds: Role[]) => {
   return protectedProcedure.use(async ({ ctx, next }) => {
     const hasRight = roleIds.some((roleId) =>
       ctx.session.user.roles.includes(roleId),
@@ -141,3 +130,36 @@ export const protectedProcedureByRoles = (roleIds: Role[]) => {
     return next();
   });
 };
+
+export function protectedProcedureByGuard(guard: (authUser: User) => boolean) {
+  return protectedProcedure.use(async ({ ctx, next }) => {
+    const isValid = guard(ctx.session.user);
+
+    if (!isValid) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+      });
+    }
+
+    return next();
+  });
+}
+
+export function protectedProcedureByGuardWithInput<Output = unknown>(
+  guard: (authUser: User, input: Output) => boolean,
+  schema: Zod.Schema<Output>,
+) {
+  return protectedProcedure.input(schema).use(async ({ ctx, input, next }) => {
+    const parsedInput = schema.parse(input);
+
+    const isValid = guard(ctx.session.user, parsedInput);
+
+    if (isValid) {
+      throw new TRPCError({
+        code: "FORBIDDEN",
+      });
+    }
+
+    return next();
+  });
+}

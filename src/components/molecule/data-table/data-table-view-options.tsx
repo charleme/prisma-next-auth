@@ -35,7 +35,7 @@ export function DataTableViewOptions<TData>({
           aria-label="Toggle columns"
           variant="outline"
           size="sm"
-          className="ml-auto hidden h-8 lg:flex"
+          className="ml-auto flex h-8"
         >
           <SlidersHorizontal className="mr-2 size-4" />
           View

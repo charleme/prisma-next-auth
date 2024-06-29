@@ -7,8 +7,8 @@ import type { Table } from "@tanstack/react-table";
 
 import { cn } from "~/lib/utils";
 import { Button } from "~/components/ui/button";
-import { DataTableFacetedFilter } from "~/components/data-table/data-table-faceted-filter";
-import { DataTableViewOptions } from "~/components/data-table/data-table-view-options";
+import { DataTableFacetedFilter } from "~/components/molecule/data-table/data-table-faceted-filter";
+import { DataTableViewOptions } from "~/components/molecule/data-table/data-table-view-options";
 import { DebouncedInput } from "~/components/form/debounce-input";
 
 interface DataTableToolbarProps<TData extends object>

@@ -2,7 +2,7 @@
 
 import { type UserListItem } from "~/types/query/user/list";
 import { getCoreRowModel, useReactTable } from "@tanstack/react-table";
-import { DataTable } from "~/components/data-table/data-table";
+import { DataTable } from "~/components/molecule/data-table/data-table";
 import { getUserColumns } from "~/app/(logged)/userColumns";
 
 export function SimpleUserList({ users }: { users: UserListItem[] }) {

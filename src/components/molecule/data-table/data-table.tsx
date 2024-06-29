@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "~/components/ui/table";
-import { DataTablePagination } from "~/components/data-table/data-table-pagination";
+import { DataTablePagination } from "~/components/molecule/data-table/data-table-pagination";
 import { z } from "zod";
 import { Skeleton } from "~/components/ui/skeleton";
 import { clsx } from "clsx";

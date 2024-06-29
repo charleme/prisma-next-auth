@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import React from "react";
-import { DataColumnHeaderButton } from "~/components/data-table/data-column-header-button";
+import { DataColumnHeaderButton } from "~/components/molecule/data-table/data-column-header-button";
 
 interface DataTableColumnHeaderProps<TData, TValue>
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -23,20 +23,32 @@ export function DataTableColumnHeader<TData, TValue>({
   title,
   className,
 }: DataTableColumnHeaderProps<TData, TValue>) {
+  const [openMenu, setOpenMenu] = React.useState(false);
+
   if (!column.getCanSort() && !column.getCanHide()) {
     return <div className={cn(className)}>{title}</div>;
   }
 
   if (!column.getCanHide()) {
-    return <DataColumnHeaderButton column={column} title={title} />;
+    return (
+      <DataColumnHeaderButton
+        column={column}
+        title={title}
+        onClick={() => column.toggleSorting()}
+      />
+    );
   }
 
   return (
-    <DropdownMenu>
+    <DropdownMenu open={openMenu} onOpenChange={(open) => setOpenMenu(open)}>
       <DropdownMenuTrigger asChild>
-        <div className={cn("flex items-center space-x-2", className)}>
-          <DataColumnHeaderButton column={column} title={title} />
-        </div>
+        <DataColumnHeaderButton
+          column={column}
+          title={title}
+          onClick={() => {
+            setOpenMenu((cur) => !cur);
+          }}
+        />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start">
         {column.getCanSort() && (

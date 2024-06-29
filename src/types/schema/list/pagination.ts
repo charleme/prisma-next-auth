@@ -8,3 +8,10 @@ export const paginationSchema = z.object({
 });
 
 export type PaginationProps = z.infer<typeof paginationSchema>;
+
+export function getPerPageStringifyOptions<T extends number>(
+  perPageOptionNumber: readonly [T, ...T[]],
+) {
+  const option = perPageOptionNumber.map(String) as [`${T}`, ...`${T}`[]];
+  return z.enum(option).transform((value) => Number(value) as T);
+}

@@ -1,13 +1,29 @@
 "use client";
 
-import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { clsx } from "clsx";
 
-export const AppMenu = () => {
+export type MenuItem = {
+  link: string;
+  label: string;
+  hide: boolean;
+};
+
+type Props = {
+  renderMenuItem: (
+    item: MenuItem,
+    isCurrentPath: boolean,
+    index: number,
+  ) => React.ReactNode;
+};
+
+export const AppMenu = ({ renderMenuItem }: Props) => {
   const pathname = usePathname();
 
-  const menuItems = [
+  const isCurrentPath = (path: string) => {
+    return pathname === path;
+  };
+
+  const menuItems: MenuItem[] = [
     {
       link: "/user-client",
       label: "Users Client",
@@ -32,23 +48,11 @@ export const AppMenu = () => {
 
   return (
     <>
-      {menuItems.map(
-        (item) =>
-          !item.hide && (
-            <div key={item.link}>
-              <Link
-                href={item.link}
-                className={clsx(
-                  "transition-colors hover:text-foreground",
-                  { "text-foreground": pathname === item.link },
-                  { "text-muted-foreground": pathname !== item.link },
-                )}
-              >
-                {item.label}
-              </Link>
-            </div>
-          ),
-      )}
+      {menuItems.map((item, index) => (
+        <div key={item.link}>
+          {!item.hide && renderMenuItem(item, isCurrentPath(item.link), index)}
+        </div>
+      ))}
     </>
   );
 };

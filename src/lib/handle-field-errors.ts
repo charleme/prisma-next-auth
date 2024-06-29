@@ -33,7 +33,7 @@ export function handleFieldErrors<
 
     for (const fieldPath of convertedFields) {
       form.control.setError(fieldPath, {
-        type: "manual",
+        type: "custom",
         message: fieldError,
       });
     }

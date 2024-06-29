@@ -134,6 +134,7 @@ export function useLazyDataTable<TData>({
     },
     meta: {
       isInitialLoading: query.isInitialLoading && data.length === 0,
+      isLoading: query.isPending,
     },
     onSortingChange,
     onColumnFiltersChange,

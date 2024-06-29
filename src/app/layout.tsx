@@ -19,8 +19,10 @@ const fontSans = FontSans({
 
 export default async function RootLayout({
   children,
+  modal,
 }: {
   children: React.ReactNode;
+  modal: React.ReactNode;
 }) {
   return (
     <html
@@ -32,7 +34,10 @@ export default async function RootLayout({
     >
       <body>
         <TRPCReactProvider>
-          <ClientProviders>{children}</ClientProviders>
+          <ClientProviders>
+            {children}
+            {modal}
+          </ClientProviders>
         </TRPCReactProvider>
         <Toaster />
       </body>

@@ -4,7 +4,7 @@ import { Badge } from "~/components/ui/badge";
 export const RoleBadge = ({ role }: { role: { id: number; name: string } }) => {
   const badgeVariants: Record<number, string> = {
     [Role.Admin]: "",
-    [Role.User]: "bg-blue-400 hover:bg-blue-400/80",
+    [Role.User]: "bg-slate-600 hover:bg-slate-600/80",
   };
 
   const className = badgeVariants[role.id];

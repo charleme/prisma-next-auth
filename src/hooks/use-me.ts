@@ -7,8 +7,8 @@ export const useMe = () => {
   const user = session.data?.user;
   return {
     user: user,
-    hasAtLeastOneRight: (roles: Role[]) =>
+    hasAtLeastOneRole: (roles: Role[]) =>
       !!user && hasAtLeastOneRole(user, roles),
-    hasRight: (role: Role) => !!user && hasRole(user, role),
+    hasRole: (role: Role) => !!user && hasRole(user, role),
   };
 };

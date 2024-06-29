@@ -1,12 +1,11 @@
-import {getAuthUser} from "~/server/auth";
-import {redirect} from "next/navigation";
+import { checkIsNotAuth } from "~/server/auth";
 
-export default async function Layout({ children }: { children: React.ReactNode }) {
-	const user = await getAuthUser();
-	
-	if (user){
-		redirect("/")
-	}
-	
+export default async function Layout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  await checkIsNotAuth();
+
   return <>{children}</>;
 }

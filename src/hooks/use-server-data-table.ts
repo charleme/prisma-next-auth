@@ -55,7 +55,7 @@ export function useServerDataTable<TData extends object>({
     search.sort_order ?? initialState?.sorting?.[0]?.desc ? "desc" : "asc";
   const initialGlobalFilter = search.global ?? initialState?.globalFilter ?? "";
 
-  const { result, isInitialLoading } = usePromise(query);
+  const { result, isInitialLoading, isLoading } = usePromise(query);
   const items = useMemo(() => result?.items ?? [], [result]);
   const count = useMemo(() => result?.count ?? 0, [result]);
 
@@ -281,6 +281,7 @@ export function useServerDataTable<TData extends object>({
     },
     meta: {
       isInitialLoading: isInitialLoading && items.length === 0,
+      isLoading: isLoading,
     },
     onPaginationChange,
     onSortingChange,

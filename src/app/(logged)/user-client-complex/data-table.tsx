@@ -8,11 +8,11 @@ import {
   getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
-import { DataTable } from "~/components/data-table/data-table";
+import { DataTable } from "~/components/molecule/data-table/data-table";
 import { getUserColumns } from "~/app/(logged)/userColumns";
 import { type DataTableFilterField } from "~/types/data-table";
-import { Role } from "~/types/enum/Role";
-import { DataTableToolbar } from "~/components/data-table/data-table-toolbar";
+import { DataTableToolbar } from "~/components/molecule/data-table/data-table-toolbar";
+import { getUserFilters } from "~/app/(logged)/userFilters";
 
 export function ComplexUserList({ users }: { users: UserListItem[] }) {
   const columns = getUserColumns();
@@ -26,34 +26,7 @@ export function ComplexUserList({ users }: { users: UserListItem[] }) {
     getFilteredRowModel: getFilteredRowModel(),
   });
 
-  const filterFields: DataTableFilterField<UserListItem>[] = [
-    {
-      variant: "global",
-      value: "global",
-      placeholder: "Search by name, email, or role...",
-    },
-    {
-      variant: "input",
-      value: "email",
-      placeholder: "Filter by email...",
-    },
-    {
-      variant: "multiSelect",
-      label: "Role",
-      value: "roles",
-      options: [
-        {
-          label: "Admin",
-          value: Role.Admin.toString(),
-        },
-
-        {
-          label: "User",
-          value: Role.User.toString(),
-        },
-      ],
-    },
-  ];
+  const filterFields: DataTableFilterField<UserListItem>[] = getUserFilters();
 
   return (
     <DataTable table={table}>

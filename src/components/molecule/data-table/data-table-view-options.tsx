@@ -35,7 +35,7 @@ export function DataTableViewOptions<TData>({
           aria-label="Toggle columns"
           variant="outline"
           size="sm"
-          className="ml-auto hidden h-8 lg:flex"
+          className="ml-auto flex h-8"
         >
           <SlidersHorizontal className="mr-2 size-4" />
           View
@@ -46,10 +46,7 @@ export function DataTableViewOptions<TData>({
         <DropdownMenuSeparator />
         {table
           .getAllColumns()
-          .filter(
-            (column) =>
-              typeof column.accessorFn !== "undefined" && column.getCanHide(),
-          )
+          .filter((column) => column.getCanHide())
           .map((column) => {
             const meta = metaSchema.parse(column.columnDef.meta);
             const label = meta?.viewSelector ?? column.id;

@@ -1,8 +1,9 @@
 import { type UserListItem } from "~/types/query/user/list";
 import { RoleBadge } from "~/components/role/role-badge";
-import { DataTableColumnHeader } from "~/components/data-table/data-column-header";
+import { DataTableColumnHeader } from "~/components/molecule/data-table/data-column-header";
 import { type ColumnDefWithViewSelectorMeta } from "~/types/data-table";
 import { SELECTION_COLUMN } from "~/types/constants/table";
+import { cn } from "~/lib/utils";
 
 export const getUserColumns =
   (): ColumnDefWithViewSelectorMeta<UserListItem>[] => {
@@ -31,6 +32,24 @@ export const getUserColumns =
         ),
       },
       {
+        id: "active",
+        accessorKey: "active",
+        meta: { viewSelector: "Active" },
+        header: ({ column }) => (
+          <DataTableColumnHeader column={column} title="Active" />
+        ),
+        cell: ({ row }) => {
+          return (
+            <div
+              className={cn("h-4 w-4 rounded-full", {
+                "bg-primary": row.original.active,
+                "border border-primary": !row.original.active,
+              })}
+            />
+          );
+        },
+      },
+      {
         id: "roles",
         filterFn: (row, _, filterValue) =>
           row.original.roles.some((role) =>
@@ -43,7 +62,6 @@ export const getUserColumns =
           <DataTableColumnHeader column={column} title="Roles" />
         ),
         cell: ({ row }) => {
-          //TODO better design for roles
           const roles = row.original.roles;
           return (
             <div className="space-x-2">

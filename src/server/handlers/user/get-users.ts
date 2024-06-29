@@ -26,6 +26,9 @@ export function searchUser<Select extends Prisma.UserSelect<ExtArgs>>({
   paginationProps: PaginationProps;
   filters: SearchUserFilter;
 }) {
+  const activeFilter =
+    filters.active?.length === 1 ? filters.active[0] : undefined;
+
   return db.user.paginate(
     {
       select: select ?? {},
@@ -40,6 +43,7 @@ export function searchUser<Select extends Prisma.UserSelect<ExtArgs>>({
             },
           },
         },
+        active: activeFilter,
         OR: [
           {
             firstName: {

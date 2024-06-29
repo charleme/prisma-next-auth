@@ -32,7 +32,7 @@ export function DataTableFacetedFilter<TData, TValue>({
   title,
   options,
 }: DataTableFacetedFilterProps<TData, TValue>) {
-  const selectedValues = new Set(column?.getFilterValue() as string[]);
+  const selectedValues = new Set(column?.getFilterValue() as Option["value"][]);
 
   return (
     <Popover>

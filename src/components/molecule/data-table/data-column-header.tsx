@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import React from "react";
-import { DataColumnHeaderButton } from "~/components/data-table/data-column-header-button";
+import { DataColumnHeaderButton } from "~/components/molecule/data-table/data-column-header-button";
 
 interface DataTableColumnHeaderProps<TData, TValue>
   extends React.HTMLAttributes<HTMLDivElement> {

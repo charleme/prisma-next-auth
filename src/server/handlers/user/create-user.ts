@@ -17,6 +17,10 @@ export const register = async ({
       password: hashedPassword,
       firstName: input.firstName,
       lastName: input.lastName,
+      roles: {
+        connect: input.roles.map((role) => ({ id: role })),
+      },
+      active: input.active,
     },
   });
 };

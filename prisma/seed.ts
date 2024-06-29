@@ -15,6 +15,7 @@ async function main() {
       lastName: faker.person.lastName(),
       password: await generatePassword("password"),
       roles: faker.helpers.arrayElements([Role.Admin, Role.User]),
+      active: faker.datatype.boolean(),
     });
 
     await prisma.$transaction([
@@ -26,6 +27,7 @@ async function main() {
           firstName: "Admin",
           lastName: "Admin",
           password: await generatePassword("admin"),
+          active: true,
           roles: {
             connect: [{ id: Role.Admin }],
           },
@@ -39,6 +41,7 @@ async function main() {
           firstName: "User",
           lastName: "User",
           password: await generatePassword("password"),
+          active: true,
           roles: {
             connect: { id: Role.User },
           },
@@ -53,6 +56,7 @@ async function main() {
             firstName: user.firstName,
             lastName: user.lastName,
             password: user.password,
+            active: user.active,
             roles: {
               connect: user.roles.map((role) => ({ id: role })),
             },

@@ -8,6 +8,7 @@ import {
   getUserByEmailOrThrow,
   getUserByIdOrThrow,
 } from "~/server/handlers/user/get-user";
+import { redirect } from "next/navigation";
 
 export const authOptions: NextAuthOptions = {
   session: {
@@ -35,6 +36,7 @@ export const authOptions: NextAuthOptions = {
             firstName: true,
             lastName: true,
             password: true,
+            active: true,
             roles: {
               select: {
                 id: true,
@@ -42,6 +44,10 @@ export const authOptions: NextAuthOptions = {
             },
           },
         });
+
+        if (!user.active) {
+          throw new Error("User is not active");
+        }
 
         const password = credentials?.password ?? "";
         if (!user) {
@@ -73,6 +79,7 @@ export const authOptions: NextAuthOptions = {
             id: true,
             email: true,
             firstName: true,
+            active: true,
             lastName: true,
             roles: {
               select: {
@@ -81,6 +88,10 @@ export const authOptions: NextAuthOptions = {
             },
           },
         });
+
+        if (!updatedUser.active) {
+          throw new Error("User is not active");
+        }
 
         const roleIds = updatedUser.roles.map((role) => role.id);
 
@@ -103,10 +114,29 @@ export const getServerAuthSession = () => getServerSession(authOptions);
 export const getAuthUser = async () => {
   const sessions = await getServerAuthSession();
   const user = sessions?.user;
+
+  if (!user) {
+    redirect("/login");
+  }
+
   return {
     user,
-    hasAtLeastOneRight: (roles: Role[]) =>
+    hasAtLeastOneRole: (roles: Role[]) =>
       !!user && hasAtLeastOneRole(user, roles),
-    hasRight: (role: Role) => !!user && hasRole(user, role),
+    hasRole: (role: Role) => !!user && hasRole(user, role),
   };
+};
+
+export const checkIsNotAuth = async () => {
+  const { user } = await getAuthUser();
+  if (user) {
+    redirect("/");
+  }
+};
+
+export const checkAuthAndRole = async (role: Role) => {
+  const { hasRole } = await getAuthUser();
+  if (!hasRole(role)) {
+    redirect("/");
+  }
 };

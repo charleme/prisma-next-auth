@@ -10,24 +10,25 @@ import {
 import { DataTable } from "~/components/molecule/data-table/data-table";
 import { getUserColumns } from "~/app/(logged)/userColumns";
 import { DataTableToolbar } from "~/components/molecule/data-table/data-table-toolbar";
-import { type api } from "~/trpc/server";
-import React, { type PropsWithChildren } from "react";
-import { useServerDataTable } from "~/hooks/use-server-data-table";
-import { getUserFilters } from "~/app/(logged)/userFilters";
+import React from "react";
+import { useSearchParamsDataTable } from "~/hooks/use-search-params-data-table";
+import { userFilters } from "~/app/(logged)/userFilters";
+import { api } from "~/trpc/react";
+import { type UserSearchItem } from "~/types/query/user/search";
 
 export function ServerSideDataTable({
-  usersPromise,
   children,
-}: PropsWithChildren<{
-  usersPromise: ReturnType<typeof api.user.search>;
-}>) {
+}: {
+  children: React.ReactNode;
+}) {
   const columns = getUserColumns();
 
-  const filterFields = getUserFilters();
-
-  const serverTableOptions = useServerDataTable({
-    query: usersPromise,
-    filterFields,
+  const serverTableOptions = useSearchParamsDataTable<
+    UserSearchItem,
+    typeof userFilters
+  >({
+    useQuery: api.user.search.useQuery,
+    filters: userFilters,
   });
 
   const table = useReactTable({
@@ -41,7 +42,7 @@ export function ServerSideDataTable({
 
   return (
     <DataTable table={table}>
-      <DataTableToolbar table={table} filterFields={filterFields}>
+      <DataTableToolbar table={table} filterFields={userFilters}>
         {children}
       </DataTableToolbar>
     </DataTable>

@@ -13,7 +13,7 @@ import { DataTableToolbar } from "~/components/molecule/data-table/data-table-to
 import { useLazyDataTable } from "~/hooks/use-lazy-data-table";
 import { api } from "~/trpc/react";
 import type { UserSearchItem } from "~/types/query/user/search";
-import { getUserFilters } from "~/app/(logged)/userFilters";
+import { userFilters } from "~/app/(logged)/userFilters";
 
 export function ComplexUserLazyList() {
   const columns = getUserColumns();
@@ -31,11 +31,9 @@ export function ComplexUserLazyList() {
     ...lazyTableOptions,
   });
 
-  const filterFields = getUserFilters();
-
   return (
     <DataTable table={table}>
-      <DataTableToolbar table={table} filterFields={filterFields} />
+      <DataTableToolbar table={table} filterFields={userFilters} />
     </DataTable>
   );
 }

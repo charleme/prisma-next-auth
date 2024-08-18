@@ -10,11 +10,12 @@ import { Button } from "~/components/ui/button";
 import { DataTableFacetedFilter } from "~/components/molecule/data-table/data-table-faceted-filter";
 import { DataTableViewOptions } from "~/components/molecule/data-table/data-table-view-options";
 import { DebouncedInput } from "~/components/form/debounce-input";
+import { z } from "zod";
 
 interface DataTableToolbarProps<TData extends object>
   extends React.HTMLAttributes<HTMLDivElement> {
   table: Table<TData>;
-  filterFields?: DataTableFilterField<TData>[];
+  filterFields?: Readonly<DataTableFilterField<TData>[]>;
 }
 
 export function DataTableToolbar<TData extends object>({
@@ -24,6 +25,23 @@ export function DataTableToolbar<TData extends object>({
   className,
   ...props
 }: DataTableToolbarProps<TData>) {
+  const resetFilters = () => {
+    table.resetGlobalFilter();
+    table.resetColumnFilters();
+  };
+
+  const onResetFilters =
+    z
+      .object({
+        onResetFilters: z.function().optional(),
+      })
+      .optional()
+      .parse(table.options.meta)?.onResetFilters ?? resetFilters;
+
+  const isFiltered =
+    table.getState().columnFilters.length > 0 ||
+    Boolean(table.getState().globalFilter);
+
   return (
     <div
       className={cn(
@@ -64,7 +82,10 @@ export function DataTableToolbar<TData extends object>({
               )
             );
           }
-          if (column.variant === "multiSelect") {
+          if (
+            column.variant === "multiSelectNumber" ||
+            column.variant === "multiSelectString"
+          ) {
             return (
               table.getColumn(column.value ? String(column.value) : "") && (
                 <DataTableFacetedFilter
@@ -79,18 +100,17 @@ export function DataTableToolbar<TData extends object>({
             );
           }
         })}
-        <Button
-          aria-label="Reset filters"
-          variant="ghost"
-          className="h-8 px-2 lg:px-3"
-          onClick={() => {
-            table.resetColumnFilters();
-            table.resetGlobalFilter();
-          }}
-        >
-          Reset
-          <X className="ml-2 size-4" aria-hidden="true" />
-        </Button>
+        {isFiltered && (
+          <Button
+            aria-label="Reset filters"
+            variant="ghost"
+            className="h-8 px-2 lg:px-3"
+            onClick={() => onResetFilters()}
+          >
+            Reset
+            <X className="ml-2 size-4" aria-hidden="true" />
+          </Button>
+        )}
       </div>
       <div className="flex items-center gap-2">
         {children}

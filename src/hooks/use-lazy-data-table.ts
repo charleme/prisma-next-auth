@@ -67,7 +67,7 @@ export function useLazyDataTable<TData>({
 
   const query = useQuery({
     per_page: pagination.pageSize,
-    page: pagination.pageIndex + 1,
+    page: pagination.pageIndex,
     global: globalFilter,
     sort_by: sorting[0]?.id,
     sort_order: sorting[0]?.desc ? "desc" : "asc",

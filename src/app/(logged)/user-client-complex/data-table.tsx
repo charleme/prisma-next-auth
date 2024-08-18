@@ -10,9 +10,8 @@ import {
 } from "@tanstack/react-table";
 import { DataTable } from "~/components/molecule/data-table/data-table";
 import { getUserColumns } from "~/app/(logged)/userColumns";
-import { type DataTableFilterField } from "~/types/data-table";
 import { DataTableToolbar } from "~/components/molecule/data-table/data-table-toolbar";
-import { getUserFilters } from "~/app/(logged)/userFilters";
+import { userFilters } from "~/app/(logged)/userFilters";
 
 export function ComplexUserList({ users }: { users: UserListItem[] }) {
   const columns = getUserColumns();
@@ -26,11 +25,9 @@ export function ComplexUserList({ users }: { users: UserListItem[] }) {
     getFilteredRowModel: getFilteredRowModel(),
   });
 
-  const filterFields: DataTableFilterField<UserListItem>[] = getUserFilters();
-
   return (
     <DataTable table={table}>
-      <DataTableToolbar table={table} filterFields={filterFields} />
+      <DataTableToolbar table={table} filterFields={userFilters} />
     </DataTable>
   );
 }

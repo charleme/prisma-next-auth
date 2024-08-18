@@ -4,10 +4,10 @@ import {
   protectedProcedureByGuard,
 } from "~/server/api/trpc";
 import { listUser, searchUser } from "~/server/handlers/user/get-users";
-import { searchUserSchema } from "~/types/schema/user/search";
 import { createUserSchema } from "~/types/schema/auth/register";
 import { register } from "~/server/handlers/user/create-user";
 import { createUserGuard } from "~/server/guard/user/create-user";
+import { userListParamsSchema } from "~/types/schema/user/search";
 
 export const userRouter = createTRPCRouter({
   create: protectedProcedureByGuard(createUserGuard)
@@ -34,7 +34,7 @@ export const userRouter = createTRPCRouter({
   }),
 
   search: protectedProcedure
-    .input(searchUserSchema)
+    .input(userListParamsSchema)
     .query(async ({ ctx, input }) => {
       const [items, count] = await searchUser({
         db: ctx.db,

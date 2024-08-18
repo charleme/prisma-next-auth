@@ -29,9 +29,29 @@ export function searchUser<Select extends Prisma.UserSelect<ExtArgs>>({
   const activeFilter =
     filters.active?.length === 1 ? filters.active[0] : undefined;
 
+  const globalFilter = filters.global
+    ? [
+        {
+          firstName: {
+            contains: filters.global,
+          },
+        },
+        {
+          lastName: {
+            contains: filters.global,
+          },
+        },
+        {
+          email: {
+            contains: filters.global,
+          },
+        },
+      ]
+    : undefined;
+
   return db.user.paginate(
     {
-      select: select ?? {},
+      select,
       where: {
         email: {
           contains: filters.email,
@@ -43,24 +63,8 @@ export function searchUser<Select extends Prisma.UserSelect<ExtArgs>>({
             },
           },
         },
-        active: activeFilter,
-        OR: [
-          {
-            firstName: {
-              contains: filters.global,
-            },
-          },
-          {
-            lastName: {
-              contains: filters.global,
-            },
-          },
-          {
-            email: {
-              contains: filters.global,
-            },
-          },
-        ],
+        active: activeFilter !== undefined ? Boolean(activeFilter) : undefined,
+        OR: globalFilter,
       },
     },
     paginationProps,

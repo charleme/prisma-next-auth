@@ -22,6 +22,9 @@ jobs:
         run: pnpm install
       - name: lint
         run: pnpm lint
+      - name: test unit
+        run: pnpm test:unit
+
   build:
     runs-on: ubuntu-latest
     env:
@@ -39,7 +42,7 @@ jobs:
         run: pnpm install
       - name: build
         run: pnpm build
-  validate-shcema:
+  validate-schema:
     runs-on: ubuntu-latest
     env:
       DATABASE_URL: file:./db.sqlite

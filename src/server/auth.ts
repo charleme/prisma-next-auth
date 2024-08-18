@@ -128,7 +128,8 @@ export const getAuthUser = async () => {
 };
 
 export const checkIsNotAuth = async () => {
-  const { user } = await getAuthUser();
+  const sessions = await getServerAuthSession();
+  const user = sessions?.user;
   if (user) {
     redirect("/");
   }

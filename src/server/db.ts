@@ -52,7 +52,7 @@ const createPrismaClient = () =>
             context.findMany({
               select: findManyArgs.select,
               where: findManyArgs.where,
-              skip: (page - 1) * per_page,
+              skip: page * per_page,
               take: per_page,
               orderBy: sort_by
                 ? {

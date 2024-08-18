@@ -9,7 +9,7 @@
 import { TRPCError, initTRPC } from "@trpc/server";
 import superjson from "superjson";
 
-import { db } from "~/server/db";
+import { db, type DbClient } from "~/server/db";
 import { getServerAuthSession } from "~/server/auth";
 import { handleErrors } from "~/server/handlers/error";
 import { type DefaultErrorShape } from "@trpc/server/unstable-core-do-not-import";
@@ -131,9 +131,11 @@ export const protectedProcedureByRole = (...roleIds: Role[]) => {
   });
 };
 
-export function protectedProcedureByGuard(guard: (authUser: User) => boolean) {
+export function protectedProcedureByGuard(
+  guard: (authUser: User, db: DbClient) => boolean,
+) {
   return protectedProcedure.use(async ({ ctx, next }) => {
-    const isValid = guard(ctx.session.user);
+    const isValid = guard(ctx.session.user, ctx.db);
 
     if (!isValid) {
       throw new TRPCError({
@@ -146,13 +148,13 @@ export function protectedProcedureByGuard(guard: (authUser: User) => boolean) {
 }
 
 export function protectedProcedureByGuardWithInput<Output = unknown>(
-  guard: (authUser: User, input: Output) => boolean,
+  guard: (authUser: User, input: Output, db: DbClient) => boolean,
   schema: Zod.Schema<Output>,
 ) {
   return protectedProcedure.input(schema).use(async ({ ctx, input, next }) => {
     const parsedInput = schema.parse(input);
 
-    const isValid = guard(ctx.session.user, parsedInput);
+    const isValid = guard(ctx.session.user, parsedInput, db);
 
     if (isValid) {
       throw new TRPCError({

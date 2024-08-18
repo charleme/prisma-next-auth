@@ -1,36 +1,34 @@
-import { type DataTableFilterField } from "~/types/data-table";
 import { Role } from "~/types/enum/Role";
-import type { UserSearchItem } from "~/types/query/user/search";
+import { type DataTableFilterField } from "~/types/data-table";
 
-export const getUserFilters = (): DataTableFilterField<UserSearchItem>[] => {
-  return [
-    {
-      variant: "global",
-      value: "global",
-      placeholder: "Search by name, email, or role...",
-    },
-    {
-      variant: "input",
-      value: "email",
-      placeholder: "Filter by email...",
-    },
-    {
-      variant: "multiSelect",
-      label: "Role",
-      value: "roles",
-      options: [
-        { label: "Admin", value: Role.Admin.toString() },
-        { label: "User", value: Role.User.toString() },
-      ],
-    },
-    {
-      variant: "multiSelect",
-      label: "Active",
-      value: "active",
-      options: [
-        { label: "Active", value: "1" },
-        { label: "Inactive", value: "0" },
-      ],
-    },
-  ];
-};
+export const userFilters = [
+  {
+    variant: "global",
+    value: "global",
+    placeholder: "Search by name, email, or role...",
+  },
+  {
+    variant: "input",
+    value: "email",
+    placeholder: "Filter by email...",
+  },
+  {
+    variant: "multiSelectNumber",
+    label: "Role",
+    value: "roles",
+    options: [
+      { label: "Admin", value: Role.Admin },
+      { label: "User", value: Role.User },
+    ],
+  },
+  {
+    variant: "multiSelectNumber",
+    label: "Active",
+    value: "active",
+    options: [
+      { label: "Active", value: 1 },
+      { label: "Inactive", value: 0 },
+    ],
+  },
+  // Can't use DataTableFilterField<UserSearchItem>[] due to circular dependency
+] as const satisfies DataTableFilterField<never>[];

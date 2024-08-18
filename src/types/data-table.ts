@@ -2,26 +2,19 @@ import { type ColumnDef, type RowData } from "@tanstack/react-table";
 
 export type SearchParams = Record<string, string | string[] | undefined>;
 
-export interface Option {
+export interface Option<TValue extends string | number = string | number> {
   label: string;
-  value: string;
+  value: TValue;
   icon?: React.ComponentType<{ className?: string }>;
   withCount?: boolean;
 }
 
+export type Variants = keyof DataTableFilterFieldVariantsFields;
+
 export type DataTableFilterField<
   TData extends object,
-  TVariant extends
-    keyof DataTableFilterFieldVariantsFields = keyof DataTableFilterFieldVariantsFields,
-> =
-  | ({
-      value: keyof TData;
-    } & DataTableFilterFieldVariants[TVariant])
-  | {
-      variant: "global";
-      value: "global";
-      placeholder: string;
-    };
+  TVariant extends Variants = Variants,
+> = DataTableFilterFieldVariants<TData>[TVariant];
 
 export type ColumnDefWithViewSelectorMeta<
   TData extends RowData,
@@ -32,17 +25,29 @@ export type ColumnDefWithViewSelectorMeta<
   };
 };
 
-type DataTableFilterFieldVariantsFields = {
+export type DataTableFilterFieldVariantsFields = {
+  global: {
+    value: "global";
+    placeholder: string;
+  };
   input: {
     placeholder: string;
   };
-  multiSelect: {
+  multiSelectString: {
     label: string;
-    options: Option[];
+    options: Readonly<[Option<string>, ...Option<string>[]]>;
   };
-  select: {
+  multiSelectNumber: {
     label: string;
-    options: Option[];
+    options: Readonly<[Option<number>, ...Option<number>[]]>;
+  };
+  selectString: {
+    label: string;
+    options: Readonly<[Option<string>, ...Option<string>[]]>;
+  };
+  selectNumber: {
+    label: string;
+    options: Readonly<[Option<number>, ...Option<number>[]]>;
   };
   // Not Implemented yet
   // date: {
@@ -50,8 +55,9 @@ type DataTableFilterFieldVariantsFields = {
   // };
 };
 
-type DataTableFilterFieldVariants = {
-  [K in keyof DataTableFilterFieldVariantsFields]: DataTableFilterFieldVariantsFields[K] & {
+export type DataTableFilterFieldVariants<TData extends object> = {
+  [K in keyof DataTableFilterFieldVariantsFields]: {
+    value: K extends "global" ? "global" : keyof TData;
     variant: K;
-  };
+  } & DataTableFilterFieldVariantsFields[K];
 };

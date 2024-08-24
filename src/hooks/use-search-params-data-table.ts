@@ -10,29 +10,35 @@ import {
 
 import { useEffect, useMemo, useState } from "react";
 import { useParams } from "~/hooks/use-params";
-import { type DataTableFilterField } from "~/types/data-table";
+import { type DataTableServerFilterField } from "~/types/data-table";
 import {
   generateUrlSchemaFromFilters,
   type RequestInput,
 } from "~/types/schema/list/filters";
 import { filterObject } from "~/lib/utils";
 
+// (
+//   params: RequestInput<TFilter>,
+//   //eslint-disable-next-line @typescript-eslint/no-explicit-any
+//   opts?: any,
+// )
+
+type BaseQueryResponse = {
+  data:
+    | {
+        items: unknown[] | undefined;
+        count: number;
+      }
+    | undefined;
+  isPending: boolean;
+};
+
 interface UseSearchParamsDataTableProps<
-  TData extends object,
-  TFilters extends Readonly<DataTableFilterField<TData>[]>,
+  TFilters extends Readonly<DataTableServerFilterField[]>,
+  TQueryResponse extends BaseQueryResponse,
 > {
   filters: TFilters;
-  useQuery: (
-    params: RequestInput<TFilters>,
-    //eslint-disable-next-line @typescript-eslint/no-explicit-any
-    opts?: any,
-  ) => {
-    data: {
-      items?: TData[] | undefined;
-      count: number;
-    };
-    isPending: boolean;
-  };
+  useQuery: (params: RequestInput<TFilters>) => TQueryResponse;
   initialState?: {
     pagination?: PaginationState;
     sorting?: SortingState[number];
@@ -40,25 +46,25 @@ interface UseSearchParamsDataTableProps<
 }
 
 export function useSearchParamsDataTable<
-  TData extends object,
-  TFilters extends Readonly<DataTableFilterField<TData>[]>,
+  TFilters extends Readonly<DataTableServerFilterField[]>,
+  TQueryResponse extends BaseQueryResponse,
 >({
   filters,
   useQuery,
   initialState,
-}: UseSearchParamsDataTableProps<TData, TFilters>) {
+}: UseSearchParamsDataTableProps<TFilters, TQueryResponse>) {
   const router = useRouter();
   const pathname = usePathname();
 
   const schema = useMemo(
-    () => generateUrlSchemaFromFilters<TData, TFilters>(filters),
+    () => generateUrlSchemaFromFilters<TFilters>(filters),
     [filters],
   );
 
   const searchParams = useParams(schema);
 
   const [lastQueryData, setLastQueryData] = useState<{
-    items: TData[];
+    items: NonNullable<NonNullable<TQueryResponse["data"]>["items"]>;
     count: number;
   } | null>(null);
 
@@ -178,7 +184,9 @@ export function useSearchParamsDataTable<
   useEffect(() => {
     if (queryData?.items) {
       setLastQueryData({
-        items: queryData.items,
+        items: queryData.items as NonNullable<
+          NonNullable<TQueryResponse["data"]>["items"]
+        >,
         count: queryData.count,
       });
     }
@@ -330,7 +338,9 @@ export function useSearchParamsDataTable<
   };
 
   return {
-    data: lastQueryData?.items ?? [],
+    data: (lastQueryData?.items ?? []) as NonNullable<
+      NonNullable<TQueryResponse["data"]>["items"]
+    >,
     rowCount: lastQueryData?.count ?? 0,
     initialState: {
       pagination: initialState?.pagination,
@@ -356,5 +366,9 @@ export function useSearchParamsDataTable<
     manualPagination: true,
     manualSorting: true,
     manualFiltering: true,
-  } satisfies Partial<TableOptions<TData>>;
+  } satisfies Partial<
+    TableOptions<
+      NonNullable<NonNullable<TQueryResponse["data"]>["items"]>[number]
+    >
+  >;
 }

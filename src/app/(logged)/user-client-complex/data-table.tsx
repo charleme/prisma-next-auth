@@ -9,9 +9,9 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { DataTable } from "~/components/molecule/data-table/data-table";
-import { getUserColumns } from "~/app/(logged)/userColumns";
+import { getUserColumns } from "~/app/(logged)/user-columns";
 import { DataTableToolbar } from "~/components/molecule/data-table/data-table-toolbar";
-import { userFilters } from "~/app/(logged)/userFilters";
+import { userFilters } from "~/app/(logged)/user-filters";
 
 export function ComplexUserList({ users }: { users: UserListItem[] }) {
   const columns = getUserColumns();

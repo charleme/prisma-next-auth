@@ -1,5 +1,5 @@
 import { Role } from "~/types/enum/Role";
-import { type DataTableFilterField } from "~/types/data-table";
+import { type DataTableServerFilterField } from "~/types/data-table";
 
 export const userFilters = [
   {
@@ -31,4 +31,4 @@ export const userFilters = [
     ],
   },
   // Can't use DataTableFilterField<UserSearchItem>[] due to circular dependency
-] as const satisfies DataTableFilterField<never>[];
+] as const satisfies DataTableServerFilterField[];

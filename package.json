@@ -56,6 +56,7 @@
     "@faker-js/faker": "^8.4.1",
     "@tanstack/react-query-devtools": "^5.37.1",
     "@testing-library/react": "^16.0.0",
+    "@total-typescript/ts-reset": "^0.6.0",
     "@types/bcrypt": "^5.0.2",
     "@types/eslint": "^8.56.2",
     "@types/node": "^20.11.20",

@@ -8,13 +8,12 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { DataTable } from "~/components/molecule/data-table/data-table";
-import { getUserColumns } from "~/app/(logged)/userColumns";
+import { getUserColumns } from "~/app/(logged)/user-columns";
 import { DataTableToolbar } from "~/components/molecule/data-table/data-table-toolbar";
 import React from "react";
 import { useSearchParamsDataTable } from "~/hooks/use-search-params-data-table";
-import { userFilters } from "~/app/(logged)/userFilters";
+import { userFilters } from "~/app/(logged)/user-filters";
 import { api } from "~/trpc/react";
-import { type UserSearchItem } from "~/types/query/user/search";
 
 export function ServerSideDataTable({
   children,
@@ -23,12 +22,9 @@ export function ServerSideDataTable({
 }) {
   const columns = getUserColumns();
 
-  const serverTableOptions = useSearchParamsDataTable<
-    UserSearchItem,
-    typeof userFilters
-  >({
-    useQuery: api.user.search.useQuery,
+  const serverTableOptions = useSearchParamsDataTable({
     filters: userFilters,
+    useQuery: (filters) => api.user.search.useQuery(filters),
   });
 
   const table = useReactTable({

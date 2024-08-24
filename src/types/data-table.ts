@@ -11,6 +11,8 @@ export interface Option<TValue extends string | number = string | number> {
 
 export type Variants = keyof DataTableFilterFieldVariantsFields;
 
+export type DataTableServerFilterField = DataTableFilterField<never>;
+
 export type DataTableFilterField<
   TData extends object,
   TVariant extends Variants = Variants,

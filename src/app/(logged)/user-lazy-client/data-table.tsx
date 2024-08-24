@@ -8,12 +8,12 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { DataTable } from "~/components/molecule/data-table/data-table";
-import { getUserColumns } from "~/app/(logged)/userColumns";
+import { getUserColumns } from "~/app/(logged)/user-columns";
 import { DataTableToolbar } from "~/components/molecule/data-table/data-table-toolbar";
 import { useLazyDataTable } from "~/hooks/use-lazy-data-table";
 import { api } from "~/trpc/react";
 import type { UserSearchItem } from "~/types/query/user/search";
-import { userFilters } from "~/app/(logged)/userFilters";
+import { userFilters } from "~/app/(logged)/user-filters";
 
 export function ComplexUserLazyList() {
   const columns = getUserColumns();

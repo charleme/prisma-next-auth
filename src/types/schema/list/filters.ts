@@ -1,7 +1,7 @@
 import { z, type ZodType } from "zod";
 import {
-  type DataTableFilterField,
   type DataTableFilterFieldVariantsFields,
+  type DataTableServerFilterField,
 } from "~/types/data-table";
 import { paginationSchema } from "~/types/schema/list/pagination";
 
@@ -14,12 +14,12 @@ const requestParamsSchema = {
   selectNumber: z.number().optional(),
 } as const;
 
-type RequestParams<Filters extends Readonly<DataTableFilterField<never>[]>> = {
+type RequestParams<Filters extends Readonly<DataTableServerFilterField[]>> = {
   [K in Filters[number] as K["value"]]: (typeof requestParamsSchema)[K["variant"]];
 };
 
 export function generateRequestSchemaFromFilters<
-  Filters extends Readonly<DataTableFilterField<never>[]>,
+  Filters extends Readonly<DataTableServerFilterField[]>,
 >(filters: Filters) {
   const schema = Object.fromEntries(
     filters.map((filter) => {
@@ -29,10 +29,7 @@ export function generateRequestSchemaFromFilters<
   return z.object(schema).and(paginationSchema);
 }
 
-type UrlParsedParams<
-  TData extends object,
-  Filters extends Readonly<DataTableFilterField<TData>[]>,
-> = {
+type UrlParsedParams<Filters extends Readonly<DataTableServerFilterField[]>> = {
   [Filter in Filters[number] as Filter["value"]]: (typeof urlParamSchema)[Filter["variant"]];
 };
 
@@ -63,14 +60,13 @@ const urlParamSchema = {
 };
 
 export function generateUrlSchemaFromFilters<
-  TData extends object,
-  Filters extends Readonly<DataTableFilterField<TData>[]>,
+  Filters extends Readonly<DataTableServerFilterField[]>,
 >(filters: Filters) {
   const schema = Object.fromEntries(
     filters.map((filter) => {
       return [filter.value, urlParamSchema[filter.variant]];
     }),
-  ) as UrlParsedParams<TData, Filters>;
+  ) as UrlParsedParams<Filters>;
   return z.object({
     ...schema,
     page: z.coerce.number().optional(),
@@ -81,5 +77,5 @@ export function generateUrlSchemaFromFilters<
 }
 
 export type RequestInput<
-  Filters extends Readonly<DataTableFilterField<never>[]>,
+  Filters extends Readonly<DataTableServerFilterField[]>,
 > = z.infer<ReturnType<typeof generateRequestSchemaFromFilters<Filters>>>;

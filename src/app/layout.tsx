@@ -5,6 +5,7 @@ import { TRPCReactProvider } from "~/trpc/react";
 import { cn } from "~/lib/utils";
 import { Toaster } from "~/components/ui/toaster";
 import ClientProviders from "~/app/client-providers";
+import "@total-typescript/ts-reset";
 
 export const metadata = {
   title: "Create T3 App",

@@ -1,7 +1,7 @@
 import { createTRPCRouter, protectedProcedureByGuard } from "~/server/api/trpc";
-import { readPostsGuard } from "~/server/guard/post/read-posts";
+import { readPostsGuard } from "~/server/guard/post/read-posts-guard";
 import { searchPosts } from "~/server/handlers/post/get-posts";
-import { postSearchParamsSchema } from "~/types/schema/post/search";
+import { postSearchParamsSchema } from "~/types/schema/post/search-post-schema";
 
 export const postRouter = createTRPCRouter({
   search: protectedProcedureByGuard(readPostsGuard)

@@ -132,10 +132,10 @@ export const protectedProcedureByRole = (...roleIds: Role[]) => {
 };
 
 export function protectedProcedureByGuard(
-  guard: (authUser: User, db: DbClient) => boolean,
+  guard: (authUser: User, db: DbClient) => boolean | Promise<boolean>,
 ) {
   return protectedProcedure.use(async ({ ctx, next }) => {
-    const isValid = guard(ctx.session.user, ctx.db);
+    const isValid = await guard(ctx.session.user, ctx.db);
 
     if (!isValid) {
       throw new TRPCError({
@@ -148,13 +148,17 @@ export function protectedProcedureByGuard(
 }
 
 export function protectedProcedureByGuardWithInput<Output = unknown>(
-  guard: (authUser: User, input: Output, db: DbClient) => boolean,
+  guard: (
+    authUser: User,
+    input: Output,
+    db: DbClient,
+  ) => boolean | Promise<boolean>,
   schema: Zod.Schema<Output>,
 ) {
   return protectedProcedure.input(schema).use(async ({ ctx, input, next }) => {
     const parsedInput = schema.parse(input);
 
-    const isValid = guard(ctx.session.user, parsedInput, db);
+    const isValid = await guard(ctx.session.user, parsedInput, db);
 
     if (isValid) {
       throw new TRPCError({

@@ -22,6 +22,8 @@ jobs:
         run: pnpm install
       - name: lint
         run: pnpm lint
+      - name: format
+        run: pnpm format
       - name: test unit
         run: pnpm vitest run
 

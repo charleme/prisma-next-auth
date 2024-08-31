@@ -25,6 +25,11 @@ export const AppMenu = ({ renderMenuItem }: Props) => {
 
   const menuItems: MenuItem[] = [
     {
+      link: "/post",
+      label: "Posts",
+      hide: false,
+    },
+    {
       link: "/user-client",
       label: "Users Client",
       hide: false,

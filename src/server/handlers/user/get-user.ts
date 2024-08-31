@@ -1,9 +1,15 @@
 import type { Prisma } from "@prisma/client";
-import { type ExtArgs, type DbClient } from "~/server/db";
+import { type DbClient, type ExtArgs } from "~/server/db";
 
-export function getUserByEmailOrThrow<
-  Select extends Prisma.UserSelect<ExtArgs>,
->({ db, select, email }: { db: DbClient; select: Select; email: string }) {
+export function getUserByEmailOrThrow<Select extends Prisma.UserSelect>({
+  db,
+  select,
+  email,
+}: {
+  db: DbClient;
+  select: Select;
+  email: string;
+}) {
   return db.user.findUniqueOrThrow({
     where: { email },
     select,

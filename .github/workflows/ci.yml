@@ -23,7 +23,7 @@ jobs:
       - name: lint
         run: pnpm lint
       - name: test unit
-        run: pnpm test:unit
+        run: pnpm vitest run
 
   build:
     runs-on: ubuntu-latest

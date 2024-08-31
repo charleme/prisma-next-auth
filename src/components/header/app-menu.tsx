@@ -30,23 +30,8 @@ export const AppMenu = ({ renderMenuItem }: Props) => {
       hide: false,
     },
     {
-      link: "/user-client",
-      label: "Users Client",
-      hide: false,
-    },
-    {
-      link: "/user-client-complex",
-      label: "Users Client complex",
-      hide: false,
-    },
-    {
-      link: "/user-lazy-client",
-      label: "Users Client lazy",
-      hide: false,
-    },
-    {
-      link: "/user-server",
-      label: "Users Server",
+      link: "/user",
+      label: "Users",
       hide: false,
     },
   ];

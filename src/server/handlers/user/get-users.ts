@@ -1,6 +1,6 @@
 import { type Prisma } from "@prisma/client";
 import { type PaginationProps } from "~/types/schema/list/pagination";
-import { type SearchUserFilter } from "~/types/schema/user/search";
+import { type SearchUserFilter } from "~/types/schema/user/search-user-schema";
 import { type DbClient, type ExtArgs } from "~/server/db";
 
 export function listUser<Select extends Prisma.UserSelect>({

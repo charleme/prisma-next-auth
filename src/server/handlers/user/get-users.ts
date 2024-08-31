@@ -1,9 +1,9 @@
 import { type Prisma } from "@prisma/client";
 import { type PaginationProps } from "~/types/schema/list/pagination";
 import { type SearchUserFilter } from "~/types/schema/user/search";
-import { type ExtArgs, type DbClient } from "~/server/db";
+import { type DbClient, type ExtArgs } from "~/server/db";
 
-export function listUser<Select extends Prisma.UserSelect<ExtArgs>>({
+export function listUser<Select extends Prisma.UserSelect>({
   db,
   select,
 }: {
@@ -67,6 +67,14 @@ export function searchUser<Select extends Prisma.UserSelect<ExtArgs>>({
         OR: globalFilter,
       },
     },
-    paginationProps,
+    {
+      per_page: paginationProps.per_page,
+      page: paginationProps.page,
+      orderBy: paginationProps.sort_by
+        ? {
+            [paginationProps.sort_by]: paginationProps.sort_order ?? "asc",
+          }
+        : undefined,
+    },
   );
 }

@@ -1,7 +1,6 @@
 import { Prisma, PrismaClient } from "@prisma/client";
 
 import { env } from "~/env";
-import type { PaginationProps } from "~/types/schema/list/pagination";
 
 const createPrismaClient = () =>
   new PrismaClient({
@@ -32,18 +31,17 @@ const createPrismaClient = () =>
             select?: Select;
             where: Prisma.Args<T, "findMany">["where"];
           },
-          paginationProps: PaginationProps,
-        ): Promise<
-          [
-            Prisma.Result<PrismaClient["user"], { select: Select }, "findMany">,
-            number,
-          ]
-        > {
+          paginationProps: {
+            per_page: number;
+            page: number;
+            orderBy: Prisma.Args<T, "findMany">["orderBy"];
+          },
+        ): Promise<[Prisma.Result<T, { select: Select }, "findMany">, number]> {
           // Get the current model at runtime
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
           const context: any = Prisma.getExtensionContext(this);
 
-          const { per_page, page, sort_by, sort_order } = paginationProps;
+          const { per_page, page, orderBy } = paginationProps;
 
           // Prisma Client query that retrieves data based
           // eslint-disable-next-line @typescript-eslint/no-unsafe-return
@@ -54,11 +52,7 @@ const createPrismaClient = () =>
               where: findManyArgs.where,
               skip: page * per_page,
               take: per_page,
-              orderBy: sort_by
-                ? {
-                    [sort_by]: sort_order,
-                  }
-                : undefined,
+              orderBy: orderBy,
             }),
 
             // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call

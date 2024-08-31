@@ -1,6 +1,5 @@
 "use client";
 
-import { type UserListItem } from "~/types/query/user/list";
 import {
   getCoreRowModel,
   getFilteredRowModel,
@@ -9,25 +8,39 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { DataTable } from "~/components/molecule/data-table/data-table";
-import { getUserColumns } from "~/app/(logged)/user-columns";
+import { getUserColumns } from "~/app/(logged)/user/user-columns";
 import { DataTableToolbar } from "~/components/molecule/data-table/data-table-toolbar";
-import { userFilters } from "~/app/(logged)/user-filters";
+import React from "react";
+import { useSearchParamsDataTable } from "~/hooks/use-search-params-data-table";
+import { userFilters } from "~/app/(logged)/user/user-filters";
+import { api } from "~/trpc/react";
 
-export function ComplexUserList({ users }: { users: UserListItem[] }) {
+export function ServerSideDataTable({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const columns = getUserColumns();
 
+  const serverTableOptions = useSearchParamsDataTable({
+    filters: userFilters,
+    useQuery: (filters) => api.user.search.useQuery(filters),
+  });
+
   const table = useReactTable({
-    data: users,
     columns,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
+    ...serverTableOptions,
   });
 
   return (
     <DataTable table={table}>
-      <DataTableToolbar table={table} filterFields={userFilters} />
+      <DataTableToolbar table={table} filterFields={userFilters}>
+        {children}
+      </DataTableToolbar>
     </DataTable>
   );
 }

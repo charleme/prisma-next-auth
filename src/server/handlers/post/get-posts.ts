@@ -1,7 +1,7 @@
 import type { Prisma } from "@prisma/client";
 import type { DbClient, ExtArgs } from "~/server/db";
 import type { PaginationProps } from "~/types/schema/list/pagination";
-import { type SearchPostFilter } from "~/types/schema/post/search";
+import { type SearchPostFilter } from "~/types/schema/post/search-post-schema";
 
 export function searchPosts<Select extends Prisma.PostSelect<ExtArgs>>({
   db,

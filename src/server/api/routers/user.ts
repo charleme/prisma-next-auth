@@ -6,8 +6,8 @@ import {
 import { listUser, searchUser } from "~/server/handlers/user/get-users";
 import { createUserSchema } from "~/types/schema/auth/register";
 import { register } from "~/server/handlers/user/create-user";
-import { createUserGuard } from "~/server/guard/user/create-user";
-import { userSearchParamsSchema } from "~/types/schema/user/search";
+import { createUserGuard } from "~/server/guard/user/create-user-guard";
+import { userSearchParamsSchema } from "~/types/schema/user/search-user-schema";
 
 export const userRouter = createTRPCRouter({
   create: protectedProcedureByGuard(createUserGuard)

@@ -1,4 +1,4 @@
-import { ServerSideDataTable } from "~/app/(logged)/user-server/data-table";
+import { ServerSideDataTable } from "~/app/(logged)/user/data-table";
 import {
   Card,
   CardContent,
@@ -10,7 +10,7 @@ import { Button } from "~/components/ui/button";
 import Link from "next/link";
 import { getAuthUser } from "~/server/auth";
 import { redirect } from "next/navigation";
-import { createUserGuard } from "~/server/guard/user/create-user";
+import { createUserGuard } from "~/server/guard/user/create-user-guard";
 
 export default async function UserListPage() {
   const { user: authUser } = await getAuthUser();

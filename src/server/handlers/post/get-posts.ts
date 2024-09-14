@@ -27,7 +27,7 @@ export function searchPosts<Select extends Prisma.PostSelect<ExtArgs>>({
    * cf read-post-guard.ts
    */
   const nonAdminFilters: Prisma.Args<typeof db.post, "findMany">["where"] =
-    isAdmin
+    !isAdmin
       ? {
           OR: [
             {
@@ -37,6 +37,13 @@ export function searchPosts<Select extends Prisma.PostSelect<ExtArgs>>({
               published: true,
             },
           ],
+        }
+      : {};
+
+  const myOwnPostFilter: Prisma.Args<typeof db.post, "findMany">["where"] =
+    filters.ownPost
+      ? {
+          authorId: currentUser.id,
         }
       : {};
 
@@ -70,6 +77,7 @@ export function searchPosts<Select extends Prisma.PostSelect<ExtArgs>>({
         title: {
           contains: filters.title,
         },
+        ...myOwnPostFilter,
         ...nonAdminFilters,
       },
     },

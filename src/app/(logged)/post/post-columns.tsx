@@ -43,4 +43,8 @@ export const postColumns: ColumnDefWithViewSelectorMeta<PostSearchItem>[] = [
       <DataTableColumnHeader column={column} title="Comment number" />
     ),
   },
+  {
+    id: "ownPost", // column only use for filtering
+    enableHiding: false, // This column cannot be displayed
+  },
 ];

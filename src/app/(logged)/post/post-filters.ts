@@ -6,4 +6,9 @@ export const postFilters = [
     value: "title",
     variant: "input",
   },
+  {
+    variant: "checkbox",
+    value: "ownPost",
+    label: "My posts",
+  },
 ] as const satisfies DataTableServerFilterField[];

@@ -12,11 +12,15 @@ export function DataTableCheckboxFilter<TData extends object>({
   tableColumn: Column<TData>;
 }) {
   const inputId = useId();
+  const labelId = "label-" + inputId;
   return (
     <div className="flex flex-row items-start space-x-3 space-y-0 rounded-md p-4">
-      <Label htmlFor={inputId}>{columnData.label}</Label>
+      <Label id={labelId} htmlFor={inputId}>
+        {columnData.label}
+      </Label>
       <Checkbox
         id={inputId}
+        aria-labelledby={labelId}
         checked={Boolean(tableColumn.getFilterValue())}
         onCheckedChange={(checked) =>
           tableColumn.setFilterValue(Boolean(checked))

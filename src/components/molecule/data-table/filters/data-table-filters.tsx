@@ -15,66 +15,63 @@ export function DataTableFilters<TData extends object>({
   table,
   column,
 }: Props<TData>) {
+  if (column.variant === "global") {
+    return (
+      <DebouncedInput
+        placeholder={column.placeholder}
+        value={(table.getState().globalFilter as string | number) ?? ""}
+        onChange={(value) => table.setGlobalFilter(value)}
+        className="h-8 w-40 lg:w-64"
+      />
+    );
+  }
   const tableColumn = table.getColumn(String(column.value));
 
-  switch (column.variant) {
-    case "global":
-      return (
+  if (column.variant === "input") {
+    return (
+      tableColumn && (
         <DebouncedInput
           placeholder={column.placeholder}
-          value={(table.getState().globalFilter as string | number) ?? ""}
-          onChange={(value) => table.setGlobalFilter(value)}
+          value={
+            (tableColumn.getFilterValue() as
+              | string
+              | number
+              | null
+              | undefined) ?? ""
+          }
+          onChange={(value) => tableColumn?.setFilterValue(value)}
           className="h-8 w-40 lg:w-64"
         />
-      );
-    case "input":
-      return (
-        tableColumn && (
-          <DebouncedInput
-            placeholder={column.placeholder}
-            value={
-              (tableColumn.getFilterValue() as
-                | string
-                | number
-                | null
-                | undefined) ?? ""
-            }
-            onChange={(value) => tableColumn?.setFilterValue(value)}
-            className="h-8 w-40 lg:w-64"
-          />
-        )
-      );
-    case "multiSelectNumber":
-    case "multiSelectString":
-      return (
-        tableColumn && (
-          <DataTableFacetedFilter
-            tableColumn={tableColumn}
-            columnData={column}
-          />
-        )
-      );
-    case "selectString":
-    case "selectNumber":
-      return (
-        tableColumn && (
-          <DataTableSelectFilter
-            columnData={column}
-            tableColumn={tableColumn}
-          />
-        )
-      );
-    case "checkbox":
-      return (
-        tableColumn && (
-          <DataTableCheckboxFilter
-            columnData={column}
-            tableColumn={tableColumn}
-          />
-        )
-      );
-
-    default:
-      throw new Error("unknown filter");
+      )
+    );
   }
+  if (
+    column.variant === "multiSelectNumber" ||
+    column.variant === "multiSelectString"
+  ) {
+    return (
+      tableColumn && (
+        <DataTableFacetedFilter tableColumn={tableColumn} columnData={column} />
+      )
+    );
+  }
+  if (column.variant === "selectString" || column.variant === "selectNumber") {
+    return (
+      tableColumn && (
+        <DataTableSelectFilter columnData={column} tableColumn={tableColumn} />
+      )
+    );
+  }
+  if (column.variant === "checkbox") {
+    return (
+      tableColumn && (
+        <DataTableCheckboxFilter
+          columnData={column}
+          tableColumn={tableColumn}
+        />
+      )
+    );
+  }
+
+  throw new Error("unknown filter");
 }

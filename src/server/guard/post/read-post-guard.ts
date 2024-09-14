@@ -4,6 +4,9 @@ import { type ReadPost } from "~/types/schema/post/read-post-schema";
 import { type DbClient } from "~/server/db";
 import { TRPCError } from "@trpc/server";
 
+/**
+ * User can read all post if admin else only published and own posts
+ */
 export const readPostGuard = async (
   authUser: User,
   input: ReadPost,

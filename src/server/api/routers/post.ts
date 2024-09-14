@@ -42,6 +42,7 @@ export const postRouter = createTRPCRouter({
         },
         filters: input,
         paginationProps: input,
+        currentUser: ctx.session.user,
       });
 
       return {

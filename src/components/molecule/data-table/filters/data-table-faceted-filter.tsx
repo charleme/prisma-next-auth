@@ -1,4 +1,4 @@
-import type { Option } from "~/types/data-table";
+import type { DataTableFilterFieldVariants, Option } from "~/types/data-table";
 import { Check, PlusCircle } from "lucide-react";
 import type { Column } from "@tanstack/react-table";
 
@@ -21,25 +21,27 @@ import {
 } from "~/components/ui/popover";
 import { Separator } from "~/components/ui/separator";
 
-interface DataTableFacetedFilterProps<TData, TValue> {
-  column?: Column<TData, TValue>;
-  title?: string;
-  options: Readonly<Option[]>;
+interface DataTableFacetedFilterProps<TData extends object, TValue> {
+  tableColumn?: Column<TData, TValue>;
+  columnData: DataTableFilterFieldVariants<TData>[
+    | "multiSelectNumber"
+    | "multiSelectString"];
 }
 
-export function DataTableFacetedFilter<TData, TValue>({
-  column,
-  title,
-  options,
+export function DataTableFacetedFilter<TData extends object, TValue>({
+  tableColumn,
+  columnData,
 }: DataTableFacetedFilterProps<TData, TValue>) {
-  const selectedValues = new Set(column?.getFilterValue() as Option["value"][]);
+  const selectedValues = new Set(
+    tableColumn?.getFilterValue() as Option["value"][],
+  );
 
   return (
     <Popover>
       <PopoverTrigger asChild>
         <Button variant="outline" size="sm" className="h-8 border-dashed">
           <PlusCircle className="mr-2 size-4" />
-          {title}
+          {columnData.label}
           {selectedValues?.size > 0 && (
             <>
               <Separator orientation="vertical" className="mx-2 h-4" />
@@ -58,7 +60,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                     {selectedValues.size} selected
                   </Badge>
                 ) : (
-                  options
+                  columnData.options
                     .filter((option) => selectedValues.has(option.value))
                     .map((option) => (
                       <Badge
@@ -77,11 +79,11 @@ export function DataTableFacetedFilter<TData, TValue>({
       </PopoverTrigger>
       <PopoverContent className="w-[12.5rem] p-0" align="start">
         <Command>
-          <CommandInput placeholder={title} />
+          <CommandInput placeholder={columnData.label} />
           <CommandList>
             <CommandEmpty>No results found.</CommandEmpty>
             <CommandGroup>
-              {options.map((option) => {
+              {columnData.options.map((option) => {
                 const isSelected = selectedValues.has(option.value);
 
                 return (
@@ -94,7 +96,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                         selectedValues.add(option.value);
                       }
                       const filterValues = Array.from(selectedValues);
-                      column?.setFilterValue(
+                      tableColumn?.setFilterValue(
                         filterValues.length ? filterValues : undefined,
                       );
                     }}
@@ -117,9 +119,13 @@ export function DataTableFacetedFilter<TData, TValue>({
                     )}
                     <span>{option.label}</span>
                     {option.withCount &&
-                      column?.getFacetedUniqueValues()?.get(option.value) && (
+                      tableColumn
+                        ?.getFacetedUniqueValues()
+                        ?.get(option.value) && (
                         <span className="ml-auto flex size-4 items-center justify-center font-mono text-xs">
-                          {column?.getFacetedUniqueValues().get(option.value)}
+                          {tableColumn
+                            ?.getFacetedUniqueValues()
+                            .get(option.value)}
                         </span>
                       )}
                   </CommandItem>
@@ -131,7 +137,7 @@ export function DataTableFacetedFilter<TData, TValue>({
                 <CommandSeparator />
                 <CommandGroup>
                   <CommandItem
-                    onSelect={() => column?.setFilterValue(undefined)}
+                    onSelect={() => tableColumn?.setFilterValue(undefined)}
                     className="justify-center text-center"
                   >
                     Clear filters

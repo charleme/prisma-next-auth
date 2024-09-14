@@ -7,10 +7,9 @@ import type { Table } from "@tanstack/react-table";
 
 import { cn } from "~/lib/utils";
 import { Button } from "~/components/ui/button";
-import { DataTableFacetedFilter } from "~/components/molecule/data-table/data-table-faceted-filter";
 import { DataTableViewOptions } from "~/components/molecule/data-table/data-table-view-options";
-import { DebouncedInput } from "~/components/form/debounce-input";
 import { z } from "zod";
+import { DataTableFilters } from "~/components/molecule/data-table/filters/data-table-filters";
 
 interface DataTableToolbarProps<TData extends object>
   extends React.HTMLAttributes<HTMLDivElement> {
@@ -51,55 +50,13 @@ export function DataTableToolbar<TData extends object>({
       {...props}
     >
       <div className="flex flex-1 items-center space-x-2">
-        {filterFields.map((column) => {
-          if (column.variant === "global") {
-            return (
-              <DebouncedInput
-                key="global"
-                placeholder={column.placeholder}
-                value={(table.getState().globalFilter as string | number) ?? ""}
-                onChange={(value) => table.setGlobalFilter(value)}
-                className="h-8 w-40 lg:w-64"
-              />
-            );
-          }
-          if (column.variant === "input") {
-            return (
-              table.getColumn(column.value ? String(column.value) : "") && (
-                <DebouncedInput
-                  key={String(column.value)}
-                  placeholder={column.placeholder}
-                  value={
-                    (table.getColumn(String(column.value))?.getFilterValue() as
-                      | string
-                      | number) ?? ""
-                  }
-                  onChange={(value) =>
-                    table.getColumn(String(column.value))?.setFilterValue(value)
-                  }
-                  className="h-8 w-40 lg:w-64"
-                />
-              )
-            );
-          }
-          if (
-            column.variant === "multiSelectNumber" ||
-            column.variant === "multiSelectString"
-          ) {
-            return (
-              table.getColumn(column.value ? String(column.value) : "") && (
-                <DataTableFacetedFilter
-                  key={String(column.value)}
-                  column={table.getColumn(
-                    column.value ? String(column.value) : "",
-                  )}
-                  title={column.label}
-                  options={column.options ?? []}
-                />
-              )
-            );
-          }
-        })}
+        {filterFields.map((column) => (
+          <DataTableFilters
+            table={table}
+            column={column}
+            key={column.value.toString()}
+          />
+        ))}
         {isFiltered && (
           <Button
             aria-label="Reset filters"

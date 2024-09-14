@@ -51,6 +51,9 @@ export type DataTableFilterFieldVariantsFields = {
     label: string;
     options: Readonly<[Option<number>, ...Option<number>[]]>;
   };
+  checkbox: {
+    label: string;
+  };
   // Not Implemented yet
   // date: {
   //   placeholder: string;

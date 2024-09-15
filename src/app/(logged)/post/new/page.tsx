@@ -1,5 +1,5 @@
 import { SimpleCard } from "~/components/molecule/card/simple-card";
-import { PostForm } from "~/components/post/post-form";
+import { CreatePostForm } from "~/components/post/create-post-form";
 
 export default async function CreatePostPage() {
   return (
@@ -8,7 +8,7 @@ export default async function CreatePostPage() {
       description={"Enter post information to create a post"}
       className={"w-full"}
     >
-      <PostForm />
+      <CreatePostForm />
     </SimpleCard>
   );
 }

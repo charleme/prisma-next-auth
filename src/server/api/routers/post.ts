@@ -55,7 +55,9 @@ export const postRouter = createTRPCRouter({
     async ({ ctx, input }) => {
       return await getPost(ctx.db, input.id, {
         id: true,
-        //TODO: Add more fields
+        title: true,
+        content: true,
+        published: true,
       });
     },
   ),

@@ -1,4 +1,4 @@
-import { CreateUserForm } from "~/app/(unlogged)/register/form";
+import { CreateUserForm } from "~/components/user/user-form";
 import { SimpleCard } from "~/components/molecule/card/simple-card";
 import { api } from "~/trpc/server";
 

@@ -6,7 +6,7 @@
  * TL;DR - This is where all the tRPC server stuff is created and plugged in. The pieces you will
  * need to use are documented accordingly near the end.
  */
-import { TRPCError, initTRPC } from "@trpc/server";
+import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 
 import { db, type DbClient } from "~/server/db";
@@ -160,7 +160,7 @@ export function protectedProcedureByGuardWithInput<Output = unknown>(
 
     const isValid = await guard(ctx.session.user, parsedInput, db);
 
-    if (isValid) {
+    if (!isValid) {
       throw new TRPCError({
         code: "FORBIDDEN",
       });

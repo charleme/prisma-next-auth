@@ -8,6 +8,7 @@ import {
 import { PostDataTable } from "~/app/(logged)/post/post-data-table";
 import { Button } from "~/components/ui/button";
 import { Plus } from "lucide-react";
+import Link from "next/link";
 
 export default function PostListPage() {
   return (
@@ -19,10 +20,12 @@ export default function PostListPage() {
         </CardHeader>
         <CardContent>
           <PostDataTable>
-            <Button size="sm" className="ml-auto h-8">
-              <Plus className="mr-2 h-4 w-4 " />
-              Create Post
-            </Button>
+            <Link href="/post/new">
+              <Button size="sm" className="ml-auto h-8">
+                <Plus className="mr-2 h-4 w-4 " />
+                Create Post
+              </Button>
+            </Link>
           </PostDataTable>
         </CardContent>
       </Card>

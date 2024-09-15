@@ -1,4 +1,4 @@
-import { CreateUserForm } from "~/app/(unlogged)/register/form";
+import { CreateUserForm } from "~/components/user/user-form";
 import { PageDialog } from "~/components/ui/dialog";
 import { SimpleDialogContent } from "~/components/molecule/dialog/simple-dialog-content";
 import { api } from "~/trpc/server";

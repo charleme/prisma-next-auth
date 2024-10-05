@@ -4,10 +4,11 @@ import { type DbClient } from "~/server/db";
 export const seedComment = async (prisma: DbClient) => {
   const now = new Date();
   const users = await prisma.user.findMany({
-    take: 30,
+    take: 20,
   });
   const posts = await prisma.post.findMany({
-    take: 50,
+    where: { published: true },
+    take: 30,
   });
 
   const comments = [];

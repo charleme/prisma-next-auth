@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import {
   type ColumnFiltersState,
@@ -7,8 +8,6 @@ import {
   type SortingState,
   type TableOptions,
 } from "@tanstack/react-table";
-
-import { useEffect, useMemo, useState } from "react";
 import { useParams } from "~/hooks/use-params";
 import { type DataTableServerFilterField } from "~/types/data-table";
 import {
@@ -16,12 +15,6 @@ import {
   type RequestInput,
 } from "~/types/schema/list/filters";
 import { filterObject } from "~/lib/utils";
-
-// (
-//   params: RequestInput<TFilter>,
-//   //eslint-disable-next-line @typescript-eslint/no-explicit-any
-//   opts?: any,
-// )
 
 type BaseQueryResponse = {
   data:

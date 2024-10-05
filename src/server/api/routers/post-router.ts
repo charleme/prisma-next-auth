@@ -29,6 +29,7 @@ export const postRouter = createTRPCRouter({
           id: true,
           title: true,
           published: true,
+          authorId: true,
           author: {
             select: {
               fullName: true,
@@ -42,6 +43,7 @@ export const postRouter = createTRPCRouter({
         },
         filters: input,
         paginationProps: input,
+        currentUser: ctx.session.user,
       });
 
       return {
@@ -54,7 +56,17 @@ export const postRouter = createTRPCRouter({
     async ({ ctx, input }) => {
       return await getPost(ctx.db, input.id, {
         id: true,
-        //TODO: Add more fields
+        title: true,
+        content: true,
+        authorId: true,
+        published: true,
+        createdAt: true,
+        updatedAt: true,
+        author: {
+          select: {
+            fullName: true,
+          },
+        },
       });
     },
   ),
@@ -78,5 +90,27 @@ export const postRouter = createTRPCRouter({
     deletePostSchema,
   ).mutation(async ({ ctx, input }) => {
     return await deletePost(ctx.db, input.postId);
+  }),
+
+  getComments: protectedProcedureByGuardWithInput(
+    readPostGuard,
+    readPostSchema,
+  ).query(async ({ ctx, input }) => {
+    return await getPost(ctx.db, input.id, {
+      id: true,
+      comments: {
+        select: {
+          id: true,
+          content: true,
+          authorId: true,
+          createdAt: true,
+          author: {
+            select: {
+              fullName: true,
+            },
+          },
+        },
+      },
+    });
   }),
 });

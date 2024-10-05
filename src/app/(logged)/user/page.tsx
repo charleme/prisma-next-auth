@@ -11,6 +11,7 @@ import Link from "next/link";
 import { getAuthUser } from "~/server/auth";
 import { redirect } from "next/navigation";
 import { createUserGuard } from "~/server/guard/user/create-user-guard";
+import { Plus } from "lucide-react";
 
 export default async function UserListPage() {
   const { user: authUser } = await getAuthUser();
@@ -30,6 +31,7 @@ export default async function UserListPage() {
             {createUserGuard(authUser) && (
               <Link href="/user/new" scroll={false}>
                 <Button size="sm" className="ml-auto h-8">
+                  <Plus className="mr-2 h-4 w-4 " />
                   Create User
                 </Button>
               </Link>

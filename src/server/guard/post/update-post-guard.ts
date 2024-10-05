@@ -8,15 +8,26 @@ export const updatePostGuard = async (
   input: UpdatePost,
   db: DbClient,
 ) => {
-  const post = await db.post.findUnique({
-    where: { id: input.id },
-    select: { authorId: true },
-  });
+  const post = await getUpdatedPost(input, db);
 
   if (!post)
     throw new TRPCError({
       code: "NOT_FOUND",
       message: "Post not found",
     });
+  return updatePostClientGuard(authUser, post);
+};
+
+const getUpdatedPost = async (input: UpdatePost, db: DbClient) => {
+  return await db.post.findUnique({
+    where: { id: input.id },
+    select: { authorId: true },
+  });
+};
+
+export const updatePostClientGuard = (
+  authUser: User,
+  post: NonNullable<Awaited<ReturnType<typeof getUpdatedPost>>>,
+) => {
   return post.authorId === authUser.id;
 };

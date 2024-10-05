@@ -10,7 +10,7 @@ import {
 
 export type SimpleCardProps = {
   title: React.ReactNode;
-  description: React.ReactNode;
+  description?: React.ReactNode;
   footer?: React.ReactNode;
 } & React.HTMLAttributes<HTMLDivElement>;
 
@@ -25,7 +25,7 @@ export const SimpleCard = ({
     <Card {...props}>
       <CardHeader>
         <CardTitle>{title}</CardTitle>
-        <CardDescription>{description}</CardDescription>
+        {description && <CardDescription>{description}</CardDescription>}
       </CardHeader>
       <CardContent>{children}</CardContent>
       {footer && <CardFooter>{footer}</CardFooter>}

@@ -12,6 +12,7 @@ const requestParamsSchema = {
   multiSelectNumber: z.number().array().optional(),
   selectString: z.string().optional(),
   selectNumber: z.number().optional(),
+  checkbox: z.boolean(),
 } as const;
 
 type RequestParams<Filters extends Readonly<DataTableServerFilterField[]>> = {
@@ -49,6 +50,11 @@ const urlParamSchema = {
     .string()
     .optional()
     .transform((v) => (v ? Number(v) : undefined)),
+  checkbox: z
+    .literal("true")
+    .or(z.literal("false"))
+    .optional()
+    .transform((v) => v === "true"),
 } satisfies {
   [Key in keyof DataTableFilterFieldVariantsFields]: ZodType<
     // eslint-disable-next-line @typescript-eslint/no-explicit-any

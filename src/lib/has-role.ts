@@ -6,5 +6,5 @@ export function hasAtLeastOneRole(user: User, roles: Role[]) {
 }
 
 export function hasRole(user: User, role: Role) {
-  return hasAtLeastOneRole(user, [role]);
+  return user.roles.includes(role);
 }

@@ -20,6 +20,17 @@ import { toast } from "~/components/ui/use-toast";
 import { readPostClientGuard } from "~/server/guard/post/read-post-guard";
 import { useMe } from "~/hooks/use-me";
 import { deletePostClientGuard } from "~/server/guard/post/delete-post-guard";
+import { AlertDialog } from "@radix-ui/react-alert-dialog";
+import {
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "~/components/ui/alert-dialog";
+import { useState } from "react";
 
 export const usePostColumns =
   (): ColumnDefWithViewSelectorMeta<PostSearchItem>[] => {
@@ -27,6 +38,10 @@ export const usePostColumns =
 
     const utils = api.useUtils();
     const { user } = useMe();
+
+    const [openDeleteDialogPostId, setOpenDeleteDialogPostId] = useState<
+      string | null
+    >(null);
 
     return [
       {
@@ -76,47 +91,79 @@ export const usePostColumns =
           const canDeletePost =
             user && deletePostClientGuard(user, row.original);
           return (
-            <DropdownMenu>
-              <DropdownMenuTrigger asChild>
-                <Button variant="ghost" className="h-8 w-8 p-0">
-                  <span className="sr-only">Open menu</span>
-                  <MoreHorizontal className="h-4 w-4" />
-                </Button>
-              </DropdownMenuTrigger>
-              <DropdownMenuContent className="w-40">
-                <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                <DropdownMenuSeparator />
-                {canReadPost && (
-                  <DropdownMenuItem>
-                    <Link href={`/post/${row.original.id}`}>View post</Link>
-                  </DropdownMenuItem>
-                )}
-                <DropdownMenuItem>View author</DropdownMenuItem>
-                {canDeletePost && <DropdownMenuSeparator />}
-                {canDeletePost && (
-                  <DropdownMenuItem
-                    className="text-destructive"
-                    onSelect={() => {
-                      deletePost(
-                        { postId: row.original.id },
-                        {
-                          // eslint-disable-next-line @typescript-eslint/no-misused-promises
-                          onSuccess: async () => {
-                            toast({
-                              title: "Post deleted",
-                              description: `${row.original.author?.fullName}'s post has been deleted with success`,
-                            });
-                            await utils.post.search.invalidate();
+            <>
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="ghost" className="h-8 w-8 p-0">
+                    <span className="sr-only">Open menu</span>
+                    <MoreHorizontal className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent className="w-40">
+                  <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                  <DropdownMenuSeparator />
+                  {canReadPost && (
+                    <DropdownMenuItem>
+                      <Link href={`/post/${row.original.id}`}>View post</Link>
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem>View author</DropdownMenuItem>
+                  {canDeletePost && <DropdownMenuSeparator />}
+                  {canDeletePost && (
+                    <DropdownMenuItem
+                      className="cursor-pointer text-destructive"
+                      onSelect={() =>
+                        setOpenDeleteDialogPostId(row.original.id)
+                      }
+                    >
+                      Delete post
+                    </DropdownMenuItem>
+                  )}
+                </DropdownMenuContent>
+              </DropdownMenu>
+              {/*Alert dialog to delete post*/}
+              <AlertDialog
+                open={openDeleteDialogPostId === row.original.id}
+                onOpenChange={(open) => {
+                  const newOpenDialogId = open ? row.original.id : null;
+                  setOpenDeleteDialogPostId(newOpenDialogId);
+                }}
+              >
+                <AlertDialogContent>
+                  <AlertDialogHeader>
+                    <AlertDialogTitle>
+                      Are you sure you want to delete this post
+                    </AlertDialogTitle>
+                    <AlertDialogDescription>
+                      This will permanently delete the post. This action cannot
+                      be undone.
+                    </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                    <AlertDialogCancel>Cancel</AlertDialogCancel>
+                    <AlertDialogAction
+                      onClick={() => {
+                        deletePost(
+                          { postId: row.original.id },
+                          {
+                            // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                            onSuccess: async () => {
+                              toast({
+                                title: "Post deleted",
+                                description: `${row.original.author?.fullName}'s post has been deleted with success`,
+                              });
+                              await utils.post.search.invalidate();
+                            },
                           },
-                        },
-                      );
-                    }}
-                  >
-                    Delete post
-                  </DropdownMenuItem>
-                )}
-              </DropdownMenuContent>
-            </DropdownMenu>
+                        );
+                      }}
+                    >
+                      Continue
+                    </AlertDialogAction>
+                  </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            </>
           );
         },
       },

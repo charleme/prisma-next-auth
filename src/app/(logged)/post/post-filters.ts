@@ -2,7 +2,7 @@ import { type DataTableServerFilterField } from "~/types/data-table";
 
 export const postFilters = [
   {
-    placeholder: "Title",
+    placeholder: "Filter by title...",
     value: "title",
     variant: "input",
   },

@@ -29,6 +29,7 @@ export const postRouter = createTRPCRouter({
           id: true,
           title: true,
           published: true,
+          authorId: true,
           author: {
             select: {
               fullName: true,
@@ -57,6 +58,7 @@ export const postRouter = createTRPCRouter({
         id: true,
         title: true,
         content: true,
+        authorId: true,
         published: true,
       });
     },

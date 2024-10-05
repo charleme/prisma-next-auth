@@ -9,19 +9,30 @@ export const deletePostGuard = async (
   input: DeletePost,
   db: DbClient,
 ) => {
-  if (authUser.roles.includes(Role.Admin)) {
-    return true;
-  }
-
-  const post = await db.post.findUnique({
-    where: { id: input.postId },
-    select: { authorId: true },
-  });
+  const post = await getDeletedPost(input, db);
 
   if (!post)
     throw new TRPCError({
       code: "NOT_FOUND",
       message: "Post not found",
     });
+  return deletePostClientGuard(authUser, post);
+};
+
+const getDeletedPost = async (input: DeletePost, db: DbClient) => {
+  return await db.post.findUnique({
+    where: { id: input.postId },
+    select: { authorId: true },
+  });
+};
+
+export const deletePostClientGuard = (
+  authUser: User,
+  post: NonNullable<Awaited<ReturnType<typeof getDeletedPost>>>,
+) => {
+  if (authUser.roles.includes(Role.Admin)) {
+    return true;
+  }
+
   return post.authorId === authUser.id;
 };

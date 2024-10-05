@@ -11,7 +11,7 @@ import { DataTableToolbar } from "~/components/molecule/data-table/data-table-to
 import { DataTable } from "~/components/molecule/data-table/data-table";
 import { type PropsWithChildren } from "react";
 import { postFilters } from "~/app/(logged)/post/post-filters";
-import { postColumns } from "~/app/(logged)/post/post-columns";
+import { usePostColumns } from "~/app/(logged)/post/use-post-columns";
 import { api } from "~/trpc/react";
 import { type DataTableFilterField } from "~/types/data-table";
 import { type PostSearchItem } from "~/types/query/post/search";
@@ -22,6 +22,8 @@ export const PostDataTable = ({ children }: PropsWithChildren) => {
     useQuery: (filters) => api.post.search.useQuery(filters),
   });
 
+  const columns = usePostColumns();
+
   const table = useReactTable({
     ...serverTableOptions,
     initialState: {
@@ -30,7 +32,8 @@ export const PostDataTable = ({ children }: PropsWithChildren) => {
         ownPost: false, // column always hide
       },
     },
-    columns: postColumns,
+    columns,
+    enableRowSelection: false,
     getCoreRowModel: getCoreRowModel(),
     getPaginationRowModel: getPaginationRowModel(),
     getSortedRowModel: getSortedRowModel(),
@@ -40,7 +43,7 @@ export const PostDataTable = ({ children }: PropsWithChildren) => {
     <DataTable table={table}>
       <DataTableToolbar
         table={table}
-        // Have to use as because filtering post on an not existing column
+        // Have to use "as" because filtering post on an not existing column
         filterFields={postFilters as DataTableFilterField<PostSearchItem>[]}
       >
         {children}

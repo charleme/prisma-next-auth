@@ -1,11 +1,11 @@
 import { Card, CardContent } from "~/components/ui/card";
 import { PostDetail } from "~/components/post/post-detail";
 import { type AppRouterOutput } from "~/server/api/root";
-import { SubmitButton } from "~/components/form/submit-button";
 import { deleteCommentClientGuard } from "~/server/guard/comment/delete-comment-guard";
 import { useMe } from "~/hooks/use-me";
 import { api } from "~/trpc/react";
 import { toast } from "~/components/ui/use-toast";
+import { DeleteCommentConfirmDialog } from "~/components/post/comment/delete-comment-confirm-dialog";
 
 export type CommentDetailProps = {
   comment: AppRouterOutput["post"]["getComments"]["comments"][number];
@@ -42,13 +42,10 @@ export const CommentCard = ({ comment }: CommentDetailProps) => {
           <PostDetail post={comment} />
           <div>
             {canDelete && (
-              <SubmitButton
-                onClick={submitDelete}
-                isSubmitting={isPending}
-                variant="destructive"
-              >
-                Delete
-              </SubmitButton>
+              <DeleteCommentConfirmDialog
+                isPending={isPending}
+                onConfirm={submitDelete}
+              />
             )}
           </div>
         </div>

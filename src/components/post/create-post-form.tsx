@@ -10,6 +10,9 @@ import { api } from "~/trpc/react";
 import { toast } from "~/components/ui/use-toast";
 import { useRouter } from "next/navigation";
 import { PostFormFields } from "~/components/post/post-form-fields";
+import type { AppRouterOutput } from "~/server/api/root";
+
+type DefaultPost = AppRouterOutput["post"]["read"];
 
 export const CreatePostForm = () => {
   const { mutate: createPost, isPending: isPendingCreatePost } =
@@ -17,10 +20,14 @@ export const CreatePostForm = () => {
 
   const defaultPost = {
     id: "",
+    author: null,
+    authorId: null as string | null,
     title: "",
     content: "",
     published: false,
-  };
+    createdAt: new Date(),
+    updatedAt: new Date(),
+  } satisfies DefaultPost as DefaultPost;
 
   const form = useForm({
     resolver: zodResolver(createPostSchema),

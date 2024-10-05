@@ -60,6 +60,13 @@ export const postRouter = createTRPCRouter({
         content: true,
         authorId: true,
         published: true,
+        createdAt: true,
+        updatedAt: true,
+        author: {
+          select: {
+            fullName: true,
+          },
+        },
       });
     },
   ),

@@ -4,14 +4,10 @@ import { InputField } from "~/components/form/input-field";
 import { CheckboxField } from "~/components/form/checkbox-field";
 import { SubmitButton } from "~/components/form/submit-button";
 import { TextAreaField } from "~/components/form/text-area-field";
+import type { AppRouterOutput } from "~/server/api/root";
 
 export type PostFormProps = {
-  form: UseFormReturn<{
-    id: string;
-    title: string;
-    content: string;
-    published: boolean;
-  }>;
+  form: UseFormReturn<AppRouterOutput["post"]["read"]>;
   isPending: boolean;
 };
 

@@ -91,4 +91,26 @@ export const postRouter = createTRPCRouter({
   ).mutation(async ({ ctx, input }) => {
     return await deletePost(ctx.db, input.postId);
   }),
+
+  getComments: protectedProcedureByGuardWithInput(
+    readPostGuard,
+    readPostSchema,
+  ).query(async ({ ctx, input }) => {
+    return await getPost(ctx.db, input.id, {
+      id: true,
+      comments: {
+        select: {
+          id: true,
+          content: true,
+          authorId: true,
+          createdAt: true,
+          author: {
+            select: {
+              fullName: true,
+            },
+          },
+        },
+      },
+    });
+  }),
 });

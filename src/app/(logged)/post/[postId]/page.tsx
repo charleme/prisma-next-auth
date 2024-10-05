@@ -8,6 +8,8 @@ import { deletePostClientGuard } from "~/server/guard/post/delete-post-guard";
 import { getAuthUser } from "~/server/auth";
 import { readPostClientGuard } from "~/server/guard/post/read-post-guard";
 import { ReadPost } from "~/components/post/read-post";
+import { PostCommentList } from "~/components/post/comment/post-comment-list";
+import { AddCommentForm } from "~/components/post/comment/add-comment-form";
 
 export default async function UpdatePostPage({
   params,
@@ -33,16 +35,19 @@ export default async function UpdatePostPage({
           <SimpleCard
             title={"Update a post"}
             description={"Enter post information to update a post"}
-            className={"w-full"}
           >
             <UpdatePostForm post={post} />
           </SimpleCard>
         ) : (
-          <SimpleCard title={post.title} className={"w-full"}>
+          <SimpleCard title={post.title}>
             <ReadPost post={post} />
           </SimpleCard>
         )}
-        <div className="mt-4 flex justify-end">
+        <SimpleCard title={`Comments`} className="my-4">
+          <PostCommentList postId={post.id} />
+          <AddCommentForm postId={post.id} />
+        </SimpleCard>
+        <div className="flex justify-end">
           {canDeletePost && <RemovePostButton postId={post.id} />}
         </div>
       </div>

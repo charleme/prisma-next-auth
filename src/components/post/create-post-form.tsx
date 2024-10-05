@@ -20,8 +20,8 @@ export const CreatePostForm = () => {
 
   const defaultPost = {
     id: "",
-    author: null,
-    authorId: null as string | null,
+    author: { fullName: "" },
+    authorId: "",
     title: "",
     content: "",
     published: false,

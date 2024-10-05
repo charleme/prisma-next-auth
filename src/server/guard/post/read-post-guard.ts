@@ -23,7 +23,7 @@ export const readPostGuard = async (
   return readPostClientGuard(authUser, post);
 };
 
-const getReadPost = async (input: ReadPost, db: DbClient) => {
+export const getReadPost = async (input: ReadPost, db: DbClient) => {
   return await db.post.findUnique({
     where: { id: input.id },
     select: { authorId: true, published: true },

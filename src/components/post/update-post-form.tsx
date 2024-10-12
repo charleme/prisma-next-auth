@@ -7,8 +7,8 @@ import { toast } from "~/components/ui/use-toast";
 import { PostFormFields } from "~/components/post/post-form-fields";
 import { type AppRouterOutput } from "~/server/api/root";
 import {
-  type UpdatePost,
-  updatePostSchema,
+  type UpdatePostForm as UpdatePostFormType,
+  updatePostFormSchema,
 } from "~/types/schema/post/update-post-schema";
 
 type UpdatePostProps = {
@@ -20,19 +20,29 @@ export const UpdatePostForm = ({ post }: UpdatePostProps) => {
     api.post.update.useMutation();
 
   const form = useForm({
-    resolver: zodResolver(updatePostSchema),
-    defaultValues: post,
+    resolver: zodResolver(updatePostFormSchema),
+    defaultValues: {
+      title: post.title,
+      content: post.content,
+      published: post.published,
+    },
   });
 
-  const onSubmit = (input: UpdatePost) => {
-    return updatePost(input, {
-      onSuccess: () => {
-        toast({
-          title: "Post updated",
-          description: `The post "${input.title}" was updated with success`,
-        });
+  const onSubmit = (input: UpdatePostFormType) => {
+    return updatePost(
+      {
+        ...input,
+        id: post.id,
       },
-    });
+      {
+        onSuccess: () => {
+          toast({
+            title: "Post updated",
+            description: `The post "${input.title}" was updated with success`,
+          });
+        },
+      },
+    );
   };
 
   return (

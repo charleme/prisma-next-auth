@@ -1,9 +1,6 @@
-import { z } from "zod";
+import { type z } from "zod";
+import { updatePostFormSchema } from "~/types/schema/post/update-post-schema";
 
-export const createPostSchema = z.object({
-  title: z.string().min(1, { message: "This field is required" }).max(255),
-  content: z.string().min(1, { message: "This field is required" }),
-  published: z.boolean(),
-});
+export const createPostSchema = updatePostFormSchema;
 
 export type CreatePost = z.infer<typeof createPostSchema>;

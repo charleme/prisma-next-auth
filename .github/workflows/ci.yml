@@ -6,20 +6,20 @@ on:
     branches:
       - main
       - develop
+
+env:
+  DATABASE_URL: file:./db.sqlite
+  NEXTAUTH_URL: http://localhost:3000
+  NEXTAUTH_SECRET: "test"
+
 jobs:
   lint:
     runs-on: ubuntu-latest
-    env:
-      DATABASE_URL: file:./db.sqlite
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        name: Install pnpm
-        with:
-          version: 9
-      - name: Install dependencies
-        run: pnpm install
+      - name: Common Setup
+        uses: ./.github/actions/common-setup
       - name: lint
         run: pnpm lint
       - name: format
@@ -29,49 +29,31 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
-    env:
-      DATABASE_URL: file:./db.sqlite
-      NEXTAUTH_URL: http://localhost:3000
-      NEXTAUTH_SECRET: "test"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        name: Install pnpm
-        with:
-          version: 9
-      - name: Install dependencies
-        run: pnpm install
+      - name: Common Setup
+        uses: ./.github/actions/common-setup
       - name: build
         run: pnpm build
+
   validate-schema:
     runs-on: ubuntu-latest
-    env:
-      DATABASE_URL: file:./db.sqlite
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        name: Install pnpm
-        with:
-          version: 9
-      - name: Install dependencies
-        run: pnpm install
+      - name: Common Setup
+        uses: ./.github/actions/common-setup
       - name: build
         run: pnpm prisma validate
+
   validate-migration:
     runs-on: ubuntu-latest
-    env:
-      DATABASE_URL: file:./db.sqlite
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - uses: pnpm/action-setup@v4
-        name: Install pnpm
-        with:
-          version: 9
-      - name: Install dependencies
-        run: pnpm install
+      - name: Common Setup
+        uses: ./.github/actions/common-setup
       - name: migrate
         run: pnpm prisma migrate reset --force
       - name: check migration

@@ -7,7 +7,7 @@ import { type RoleItem } from "~/types/query/role/list";
 import { useToast } from "~/components/ui/use-toast";
 import {
   type UpdateUserForm,
-  updateUserSchema,
+  updateUserFormSchema,
 } from "~/types/schema/user/update-user-schema";
 import { InputField } from "~/components/form/input-field";
 import { MultiSelectField } from "~/components/form/multi-select-field";
@@ -18,13 +18,14 @@ import { Form } from "~/components/ui/form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { type Role } from "~/types/enum/Role";
 import { ViewUserMail } from "~/components/user/view-user-mail";
+import { useSession } from "next-auth/react";
 
 export type UpdateUserFormProps = {
-  userId: string;
   roles: RoleItem[];
   canViewActive?: boolean;
   canUpdateRole?: boolean;
   user: RouterOutputs["user"]["read"];
+  isCurrentUser: boolean;
 };
 
 export function UpdateUserForm({
@@ -32,9 +33,11 @@ export function UpdateUserForm({
   user,
   canUpdateRole,
   canViewActive,
+  isCurrentUser,
 }: UpdateUserFormProps) {
   const { mutate: updateUser, isPending } = api.user.update.useMutation();
   const { toast } = useToast();
+  const { update } = useSession();
 
   const form = useForm({
     defaultValues: {
@@ -43,18 +46,22 @@ export function UpdateUserForm({
       roles: user.roles.map((role) => role.id) as Role[],
       active: user.active,
     },
-    resolver: zodResolver(updateUserSchema),
+    resolver: zodResolver(updateUserFormSchema),
   });
 
   const onSubmit = (data: UpdateUserForm) => {
     updateUser(
       { ...data, userId: user.id },
       {
-        onSuccess: () => {
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
+        onSuccess: async () => {
           toast({
             title: "User updated",
             description: `The user ${user.email} was updated with success`,
           });
+          if (isCurrentUser) {
+            await update();
+          }
         },
         onError: (error) => {
           handleFieldErrors(form, error);

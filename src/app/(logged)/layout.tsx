@@ -1,6 +1,7 @@
 import { getAuthUser } from "~/server/auth";
 import { redirect } from "next/navigation";
 import { Header } from "~/app/(logged)/header";
+import { TokenRefreshContainer } from "~/app/(logged)/token-refresh";
 
 export default async function Layout({
   children,
@@ -13,5 +14,9 @@ export default async function Layout({
     redirect("/login");
   }
 
-  return <Header user={user}>{children}</Header>;
+  return (
+    <TokenRefreshContainer>
+      <Header user={user}>{children}</Header>
+    </TokenRefreshContainer>
+  );
 }

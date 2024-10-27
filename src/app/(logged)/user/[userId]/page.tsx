@@ -31,6 +31,7 @@ export default async function ViewUserPage({
   const canViewActiveField = viewActiveFieldUserGuard({ authUser });
   const canUpdateRole = updateUserRoleGuard({ authUser });
   const canDeleteUser = deleteUserGuard({ authUser });
+  const isCurrentUser = authUser.id === viewedUser.id;
 
   if (!canViewUser) {
     throw new Error("Current user can't view this user");
@@ -40,7 +41,7 @@ export default async function ViewUserPage({
       <div>
         <SimpleCard title="Mettre à jour le profil">
           <UpdateUserForm
-            userId={viewedUser.id}
+            isCurrentUser={isCurrentUser}
             user={viewedUser}
             roles={roles}
             canViewActive={canViewActiveField}

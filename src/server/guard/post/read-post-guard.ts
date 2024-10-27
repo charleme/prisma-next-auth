@@ -1,17 +1,21 @@
 import type { User } from "next-auth";
 import { Role } from "~/types/enum/Role";
 import { type ReadPost } from "~/types/schema/post/read-post-schema";
-import { type DbClient } from "~/server/db";
+import { type HandlerDbClient } from "~/server/db";
 import { TRPCError } from "@trpc/server";
 
 /**
  * User can read all post if admin else only published and own posts
  */
-export const readPostGuard = async (
-  authUser: User,
-  input: ReadPost,
-  db: DbClient,
-) => {
+export const readPostGuard = async ({
+  authUser,
+  input,
+  db,
+}: {
+  authUser: User;
+  input: ReadPost;
+  db: HandlerDbClient;
+}) => {
   const post = await getReadPost(input, db);
 
   if (!post)
@@ -23,7 +27,7 @@ export const readPostGuard = async (
   return readPostClientGuard(authUser, post);
 };
 
-export const getReadPost = async (input: ReadPost, db: DbClient) => {
+export const getReadPost = async (input: ReadPost, db: HandlerDbClient) => {
   return await db.post.findUnique({
     where: { id: input.id },
     select: { authorId: true, published: true },

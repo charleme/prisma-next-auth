@@ -1,9 +1,9 @@
-import { type DbClient } from "~/server/db";
+import { type HandlerDbClient } from "~/server/db";
 import { type User } from "next-auth";
 import { type UpdatePost } from "~/types/schema/post/update-post-schema";
 
 export const updatePost = async (
-  db: DbClient,
+  db: HandlerDbClient,
   currentUser: User,
   post: UpdatePost,
 ) => {

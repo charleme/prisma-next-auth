@@ -8,7 +8,10 @@ const generatePassword = async (password: string) => await hash(password, 10);
 export const seedUser = async (prisma: DbClient) => {
   const users = [];
   for (let i = 0; i < 50; i++) {
-    const createdAt = faker.date.recent();
+    const createdAt = faker.date.between({
+      from: new Date(2020, 0, 1),
+      to: new Date(),
+    });
     const updatedAt = faker.date.between({ from: createdAt, to: new Date() });
     users.push({
       email: faker.internet.email(),

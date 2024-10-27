@@ -1,13 +1,13 @@
-import { type RegisterFormData } from "~/types/schema/auth/register";
+import { type CreateUser } from "~/types/schema/user/create-user-schema";
 import { hash } from "bcrypt";
-import { type DbClient } from "~/server/db";
+import { type HandlerDbClient } from "~/server/db";
 
-export const register = async ({
+export const createUser = async ({
   db,
   input,
 }: {
-  db: DbClient;
-  input: RegisterFormData;
+  db: HandlerDbClient;
+  input: CreateUser;
 }) => {
   const hashedPassword = await hash(input.password, 10);
 

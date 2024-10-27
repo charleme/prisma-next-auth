@@ -82,6 +82,10 @@ const globalForPrisma = globalThis as unknown as {
 export const db = globalForPrisma.prisma ?? createPrismaClient();
 
 export type DbClient = ReturnType<typeof createPrismaClient>;
+export type HandlerDbClient = Omit<
+  DbClient,
+  "$transaction" | "$connect" | "$disconnect" | "$extends"
+>;
 
 export type ExtArgs = DbClient["$extends"]["extArgs"];
 

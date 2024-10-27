@@ -1,4 +1,4 @@
-import { ServerSideDataTable } from "~/app/(logged)/user/data-table";
+import { ServerSideDataTable } from "~/app/(logged)/user/user-data-table";
 import {
   Card,
   CardContent,
@@ -12,12 +12,15 @@ import { getAuthUser } from "~/server/auth";
 import { redirect } from "next/navigation";
 import { createUserGuard } from "~/server/guard/user/create-user-guard";
 import { Plus } from "lucide-react";
+import { viewActiveFieldUserGuard } from "~/server/guard/user/view-active-field-user-guard";
 
 export default async function UserListPage() {
   const { user: authUser } = await getAuthUser();
   if (!authUser) {
     return redirect(`/login`);
   }
+
+  const canViewActive = viewActiveFieldUserGuard({ authUser });
 
   return (
     <div>
@@ -27,8 +30,8 @@ export default async function UserListPage() {
           <CardDescription>View the app users and manage them</CardDescription>
         </CardHeader>
         <CardContent>
-          <ServerSideDataTable>
-            {createUserGuard(authUser) && (
+          <ServerSideDataTable canViewActive={canViewActive}>
+            {createUserGuard({ authUser }) && (
               <Link href="/user/new" scroll={false}>
                 <Button size="sm" className="ml-auto h-8">
                   <Plus className="mr-2 h-4 w-4 " />

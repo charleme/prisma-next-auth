@@ -1,8 +1,8 @@
 import { type z } from "zod";
 import { generateRequestSchemaFromFilters } from "~/types/schema/list/filters";
-import { userFilters } from "~/app/(logged)/user/user-filters";
+import { getUserFilters } from "~/app/(logged)/user/get-user-filters";
 
 export const userSearchParamsSchema =
-  generateRequestSchemaFromFilters(userFilters);
+  generateRequestSchemaFromFilters(getUserFilters());
 
 export type SearchUserFilter = z.infer<typeof userSearchParamsSchema>;

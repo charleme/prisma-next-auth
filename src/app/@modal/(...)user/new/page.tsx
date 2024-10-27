@@ -1,9 +1,9 @@
-import { CreateUserForm } from "~/components/user/user-form";
 import { PageDialog } from "~/components/ui/dialog";
 import { SimpleDialogContent } from "~/components/molecule/dialog/simple-dialog-content";
 import { api } from "~/trpc/server";
 import { checkAuthAndRole } from "~/server/auth";
 import { Role } from "~/types/enum/Role";
+import { CreateUserForm } from "~/components/user/create-user-form";
 
 export default async function CreateUserPage() {
   const roles = await api.role.list();

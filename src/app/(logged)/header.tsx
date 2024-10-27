@@ -8,6 +8,7 @@ import { Button } from "~/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
 } from "~/components/ui/dropdown-menu";
 import { SignOutMenuItem } from "~/components/header/sign-out-menu-item";
@@ -99,6 +100,9 @@ export function Header({
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
+              <Link href={`/user/${user.id}`}>
+                <DropdownMenuItem>My Profile</DropdownMenuItem>
+              </Link>
               <SignOutMenuItem />
             </DropdownMenuContent>
           </DropdownMenu>

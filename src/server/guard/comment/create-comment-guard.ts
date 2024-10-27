@@ -4,15 +4,19 @@ import {
   readPostGuard,
 } from "~/server/guard/post/read-post-guard";
 import type { User } from "next-auth";
-import type { DbClient } from "~/server/db";
+import type { HandlerDbClient } from "~/server/db";
 import { type CreateComment } from "~/types/schema/comment/create-delete-schema";
 import { TRPCError } from "@trpc/server";
 
-export const createCommentGuard = async (
-  authUser: User,
-  input: CreateComment,
-  db: DbClient,
-) => {
+export const createCommentGuard = async ({
+  authUser,
+  input,
+  db,
+}: {
+  authUser: User;
+  input: CreateComment;
+  db: HandlerDbClient;
+}) => {
   const post = await db.post.findUnique({
     where: { id: input.postId },
     select: { id: true },
@@ -25,7 +29,7 @@ export const createCommentGuard = async (
     });
   }
 
-  return readPostGuard(authUser, post, db);
+  return readPostGuard({ authUser, input: post, db });
 };
 
 export const createCommentClientGuard = (

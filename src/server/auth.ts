@@ -5,8 +5,8 @@ import { getServerSession, type NextAuthOptions } from "next-auth";
 import { hasAtLeastOneRole, hasRole } from "~/lib/has-role";
 import { type Role } from "~/types/enum/Role";
 import {
-  getUserByEmailOrThrow,
-  getUserByIdOrThrow,
+  getActiveUserByEmailOrThrow,
+  getActiveUserByIdOrThrow,
 } from "~/server/handlers/user/get-user";
 import { redirect } from "next/navigation";
 
@@ -27,7 +27,7 @@ export const authOptions: NextAuthOptions = {
         password: {},
       },
       async authorize(credentials, _) {
-        const user = await getUserByEmailOrThrow({
+        const user = await getActiveUserByEmailOrThrow({
           email: credentials?.email ?? "",
           db,
           select: {
@@ -44,10 +44,6 @@ export const authOptions: NextAuthOptions = {
             },
           },
         });
-
-        if (!user.active) {
-          throw new Error("User is not active");
-        }
 
         const password = credentials?.password ?? "";
         if (!user) {
@@ -72,7 +68,7 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user, trigger }) {
       // refresh token
       if (trigger === "update") {
-        const updatedUser = await getUserByIdOrThrow({
+        const updatedUser = await getActiveUserByIdOrThrow({
           db,
           id: user?.id || token.id,
           select: {
@@ -88,10 +84,6 @@ export const authOptions: NextAuthOptions = {
             },
           },
         });
-
-        if (!updatedUser.active) {
-          throw new Error("User is not active");
-        }
 
         const roleIds = updatedUser.roles.map((role) => role.id);
 

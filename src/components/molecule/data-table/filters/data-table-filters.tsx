@@ -15,6 +15,10 @@ export function DataTableFilters<TData extends object>({
   table,
   column,
 }: Props<TData>) {
+  if (column.hide) {
+    return null;
+  }
+
   if (column.variant === "global") {
     return (
       <DebouncedInput

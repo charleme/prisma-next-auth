@@ -1,9 +1,9 @@
 import { type CreatePost } from "~/types/schema/post/create-post-schema";
-import { type DbClient } from "~/server/db";
+import { type HandlerDbClient } from "~/server/db";
 import { type User } from "next-auth";
 
 export const createPost = async (
-  db: DbClient,
+  db: HandlerDbClient,
   currentUser: User,
   post: CreatePost,
 ) => {

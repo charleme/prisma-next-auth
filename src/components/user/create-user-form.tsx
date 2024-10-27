@@ -7,9 +7,9 @@ import { Form } from "~/components/ui/form";
 import { api } from "~/trpc/react";
 import { InputField } from "~/components/form/input-field";
 import {
-  type RegisterFormData,
+  type CreateUser,
   createUserSchema,
-} from "~/types/schema/auth/register";
+} from "~/types/schema/user/create-user-schema";
 import { useRouter } from "next/navigation";
 import { SubmitButton } from "~/components/form/submit-button";
 import { handleFieldErrors } from "~/lib/handle-field-errors";
@@ -40,7 +40,7 @@ export function CreateUserForm({ roles }: CreateUserFormProps) {
     },
   });
 
-  const onSubmit = (data: RegisterFormData) => {
+  const onSubmit = (data: CreateUser) => {
     register(data, {
       onSuccess: () => {
         toast({

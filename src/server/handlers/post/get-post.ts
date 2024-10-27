@@ -1,8 +1,8 @@
-import { type DbClient, type ExtArgs } from "~/server/db";
+import { type ExtArgs, type HandlerDbClient } from "~/server/db";
 import type { Prisma } from "@prisma/client";
 
 export async function getPost<Select extends Prisma.PostSelect<ExtArgs>>(
-  db: DbClient,
+  db: HandlerDbClient,
   postId: string,
   select: Select,
 ) {

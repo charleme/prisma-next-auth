@@ -8,19 +8,22 @@ import {
   useReactTable,
 } from "@tanstack/react-table";
 import { DataTable } from "~/components/molecule/data-table/data-table";
-import { getUserColumns } from "~/app/(logged)/user/user-columns";
+import { useUserColumns } from "~/app/(logged)/user/user-columns";
 import { DataTableToolbar } from "~/components/molecule/data-table/data-table-toolbar";
 import React from "react";
 import { useSearchParamsDataTable } from "~/hooks/use-search-params-data-table";
-import { userFilters } from "~/app/(logged)/user/user-filters";
+import { getUserFilters } from "~/app/(logged)/user/get-user-filters";
 import { api } from "~/trpc/react";
 
 export function ServerSideDataTable({
+  canViewActive,
   children,
 }: {
+  canViewActive: boolean;
   children: React.ReactNode;
 }) {
-  const columns = getUserColumns();
+  const columns = useUserColumns(canViewActive);
+  const userFilters = getUserFilters(canViewActive);
 
   const serverTableOptions = useSearchParamsDataTable({
     filters: userFilters,

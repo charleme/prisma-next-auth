@@ -9,6 +9,10 @@ export const seedPost = async (prisma: DbClient) => {
   });
 
   const posts = [];
+
+  const date = new Date();
+  date.setDate(date.getDate() - 14);
+
   for (let i = 0; i < 90; i++) {
     const author = faker.helpers.arrayElement(users);
     posts.push({
@@ -16,7 +20,7 @@ export const seedPost = async (prisma: DbClient) => {
       content: faker.lorem.paragraphs({ min: 1, max: 5 }),
       authorId: author.id,
       published: faker.datatype.boolean(),
-      createdAt: faker.date.between({ from: author.createdAt, to: now }),
+      createdAt: faker.date.between({ from: date, to: now }),
     });
   }
 

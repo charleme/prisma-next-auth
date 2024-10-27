@@ -1,10 +1,15 @@
 import {
   createTRPCRouter,
+  protectedProcedure,
   protectedProcedureByGuard,
   protectedProcedureByGuardWithInput,
 } from "~/server/api/trpc";
 import { readPostsGuard } from "~/server/guard/post/read-posts-guard";
-import { searchPosts } from "~/server/handlers/post/get-posts";
+import {
+  getPostCount,
+  getPostCountPerDay,
+  searchPosts,
+} from "~/server/handlers/post/get-posts";
 import { postSearchParamsSchema } from "~/types/schema/post/search-post-schema";
 import { readPostGuard } from "~/server/guard/post/read-post-guard";
 import { readPostSchema } from "~/types/schema/post/read-post-schema";
@@ -112,5 +117,52 @@ export const postRouter = createTRPCRouter({
         },
       },
     });
+  }),
+
+  getPostCountPerDay: protectedProcedure.query(async ({ ctx }) => {
+    const previousWeek = new Date();
+    previousWeek.setDate(previousWeek.getDate() - 7);
+    previousWeek.setHours(0, 0, 0, 0);
+
+    const now = new Date();
+
+    return getPostCountPerDay({
+      db: ctx.db,
+      from: previousWeek,
+      to: now,
+    });
+  }),
+  getPostEvolution: protectedProcedure.query(async ({ ctx }) => {
+    const twoWeeksAgo = new Date();
+    twoWeeksAgo.setDate(twoWeeksAgo.getDate() - 14);
+    twoWeeksAgo.setHours(0, 0, 0, 0);
+
+    const previousWeek = new Date();
+    previousWeek.setDate(previousWeek.getDate() - 7);
+    previousWeek.setHours(0, 0, 0, 0);
+
+    const now = new Date();
+
+    const [currentWeekCount, previousWeekCount] = await Promise.all([
+      getPostCount({
+        db: ctx.db,
+        from: previousWeek,
+        to: now,
+      }),
+      getPostCount({
+        db: ctx.db,
+        from: twoWeeksAgo,
+        to: previousWeek,
+      }),
+    ]);
+
+    const rateBetweenWeeks = previousWeekCount
+      ? currentWeekCount / previousWeekCount
+      : null;
+
+    return {
+      currentWeekCount,
+      rateBetweenWeeks,
+    };
   }),
 });

@@ -10,4 +10,4 @@ export const createUserSchema = z.object({
   active: z.boolean(),
 });
 
-export type RegisterFormData = z.infer<typeof createUserSchema>;
+export type CreateUser = z.infer<typeof createUserSchema>;

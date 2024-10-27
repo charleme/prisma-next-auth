@@ -63,6 +63,7 @@ export type DataTableFilterFieldVariantsFields = {
 export type DataTableFilterFieldVariants<TData extends object> = {
   [K in keyof DataTableFilterFieldVariantsFields]: {
     value: K extends "global" ? "global" : keyof TData;
+    hide?: boolean;
     variant: K;
   } & DataTableFilterFieldVariantsFields[K];
 };

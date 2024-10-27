@@ -1,6 +1,6 @@
-import { CreateUserForm } from "~/components/user/user-form";
 import { SimpleCard } from "~/components/molecule/card/simple-card";
 import { api } from "~/trpc/server";
+import { CreateUserForm } from "~/components/user/create-user-form";
 
 export default async function CreateUserPage() {
   const roles = await api.role.list();

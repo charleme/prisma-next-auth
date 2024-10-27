@@ -1,11 +1,27 @@
-import { getAuthUser } from "~/server/auth";
+import Dashboard from "~/components/dashboard";
+import { api } from "~/trpc/server";
 
 export default async function LoginPage() {
-  const { user } = await getAuthUser();
-
+  const [
+    userCount,
+    postEvolution,
+    commentEvolution,
+    postCountPerDay,
+    commentCountPerDay,
+  ] = await Promise.all([
+    api.user.userCount(),
+    api.post.getPostEvolution(),
+    api.comment.getCommentEvolution(),
+    api.post.getPostCountPerDay(),
+    api.comment.getCommentCountPerDay(),
+  ]);
   return (
-    <section className="flex h-screen items-center justify-center">
-      <div className="w-[600px]">Hello {user.email}</div>
-    </section>
+    <Dashboard
+      userCount={userCount}
+      postEvolution={postEvolution}
+      commentEvolution={commentEvolution}
+      postCountPerDay={postCountPerDay}
+      commentCountPerDay={commentCountPerDay}
+    />
   );
 }

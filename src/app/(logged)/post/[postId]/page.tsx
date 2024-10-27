@@ -17,8 +17,12 @@ export default async function UpdatePostPage({
   params: { postId: string };
 }) {
   try {
-    //TODO: read post
-    const post = await api.post.read({ id: params.postId });
+    const [post, comments] = await Promise.all([
+      api.post.read({ id: params.postId }),
+      api.post.getComments({
+        id: params.postId,
+      }),
+    ]);
     const { user } = await getAuthUser();
     const canReadPost = readPostClientGuard(user, post);
 
@@ -44,7 +48,7 @@ export default async function UpdatePostPage({
           </SimpleCard>
         )}
         <SimpleCard title={`Comments`} className="my-4">
-          <PostCommentList postId={post.id} />
+          <PostCommentList postId={post.id} initialComments={comments} />
           <AddCommentForm postId={post.id} />
         </SimpleCard>
         <div className="flex justify-end">

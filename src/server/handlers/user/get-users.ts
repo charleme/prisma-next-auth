@@ -1,13 +1,13 @@
 import { type Prisma } from "@prisma/client";
 import { type PaginationProps } from "~/types/schema/list/pagination";
 import { type SearchUserFilter } from "~/types/schema/user/search-user-schema";
-import { type DbClient, type ExtArgs } from "~/server/db";
+import { type DbClient, type ExtArgs, type HandlerDbClient } from "~/server/db";
 
 export function listUser<Select extends Prisma.UserSelect>({
   db,
   select,
 }: {
-  db: DbClient;
+  db: HandlerDbClient;
   select: Select;
 }) {
   return db.user.findMany({
@@ -78,3 +78,7 @@ export function searchUser<Select extends Prisma.UserSelect<ExtArgs>>({
     },
   );
 }
+
+export const getUserCount = ({ db }: { db: HandlerDbClient }) => {
+  return db.user.count();
+};
